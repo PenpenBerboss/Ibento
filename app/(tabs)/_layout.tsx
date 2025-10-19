@@ -1,114 +1,69 @@
 import { Tabs } from 'expo-router';
-import { 
-  Entypo,
-  AntDesign 
-} from '@expo/vector-icons';
-import { View } from 'react-native';
+import { Home, Users, MessageCircle, Video, Menu } from 'lucide-react-native';
 
 export default function TabLayout() {
-  const { colors, isDark } = useTheme();
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarActiveTintColor: '#1e90ff',
+        tabBarInactiveTintColor: '#a0a0a0',
         tabBarStyle: {
-          backgroundColor: colors.surface,
+          backgroundColor: '#1a1a1a',
           borderTopWidth: 1,
-          borderTopColor: colors.border,
-          height: 100,
+          borderTopColor: '#333333',
+          height: 80,
           paddingBottom: 20,
-          paddingTop: 20,
-          shadowColor: colors.text,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: isDark ? 0.05 : 0.1,
-          shadowRadius: 8,
-          elevation: 8,
+          paddingTop: 10,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
-          marginTop: 2,
-          color: colors.textSecondary,
-        },
-        tabBarIconStyle: {
-          marginTop: 0,
         },
       }}
     >
-            <Tabs.Screen
+      <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          href: '/',
-          tabBarIcon: ({ focused, color }) => (
-            <Entypo name="home" size={24} color={focused ? colors.primary : colors.textSecondary} />
+          tabBarIcon: ({ color, size }) => (
+            <Home size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="my-wallets"
+        name="community"
         options={{
-          title: 'Catégories',
-          href: '/my-wallets',
-          tabBarIcon: ({ focused, size }) => (
-            <WalletIcon
-              size={24}
-              color={focused ? colors.primary : colors.textSecondary}
-            />
+          title: 'Community',
+          tabBarIcon: ({ color, size }) => (
+            <Users size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="new-transaction"
+        name="chats"
         options={{
-          title: '',
-          href: '/new-transaction',
-          tabBarIcon: ({ focused }) => (
-            <View
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 16,
-                backgroundColor: colors.primary,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: -5,
-                shadowColor: colors.primary,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
-              }}
-            >
-              <AntDesign name="plus" size={28} color={colors.surface} />
-            </View>
-          ),
-          tabBarLabel: () => null,
-        }}
-      />
-            <Tabs.Screen
-        name="analytics"
-        options={{
-          title: 'Analytics',
-          href: '/analytics',
-          tabBarIcon: ({ focused, size }) => (
-            <StatIcon
-              size={24}
-              color={focused ? colors.primary : colors.textSecondary}
-            />
+          title: 'Chats',
+          tabBarIcon: ({ color, size }) => (
+            <MessageCircle size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="reels"
         options={{
-          title: 'Profil',
-          href: '/profile',
-          tabBarIcon: ({ focused, size }) => (
-            <UserLightIcon size={24} color={focused ? colors.primary : colors.textSecondary} />
+          title: 'Reels',
+          tabBarIcon: ({ color, size }) => (
+            <Video size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="more"
+        options={{
+          title: 'More',
+          tabBarIcon: ({ color, size }) => (
+            <Menu size={size} color={color} />
           ),
         }}
       />
