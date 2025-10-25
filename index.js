@@ -1,22 +1,34 @@
-// Disable native screens to avoid native-side type mismatches in this dev setup.
-// This forces the JS implementation of screens which is more tolerant during dev.
-try {
-	const { enableScreens } = require('react-native-screens');
-	if (enableScreens) enableScreens(false);
-} catch (e) {
-	// ignore if react-native-screens not available
-}
-// Polyfill Node's Buffer for libraries that import "buffer" (ex: react-native-svg, lucide-react-native)
-try {
-	const { Buffer } = require('buffer');
-	if (global && !global.Buffer) {
-		global.Buffer = Buffer;
-	}
-} catch (e) {
-	// ignore if buffer not available
-}
+// Configuration initiale pour les screens natifs et le buffer
+const setupEnvironment = () => {
+  // Configurer react-native-screens
+  try {
+    const { enableScreens } = require('react-native-screens');
+    // Désactiver les screens natifs en dev pour éviter les problèmes de type
+    enableScreens(false);
+  } catch (e) {
+    console.warn('react-native-screens non disponible:', e.message);
+  }
 
-// Import Reanimated configuration
-require('./reanimated-setup');
+  // Configurer le polyfill Buffer
+  try {
+    const { Buffer } = require('buffer');
+    if (typeof global !== 'undefined' && !global.Buffer) {
+      global.Buffer = Buffer;
+    }
+  } catch (e) {
+    console.warn('buffer polyfill non disponible:', e.message);
+  }
 
+  // Assurer que Reanimated est configuré en premier
+  try {
+    require('./reanimated-setup');
+  } catch (e) {
+    console.warn('erreur de configuration reanimated:', e.message);
+  }
+};
+
+// Exécuter la configuration
+setupEnvironment();
+
+// Démarrer l'application
 require('expo-router/entry');
