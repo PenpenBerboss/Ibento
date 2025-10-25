@@ -22,7 +22,7 @@ export const animeList: Anime[] = [
     rating: 8.9,
     season: 'Fall',
     year: 1999,
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
+    image: 'https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p186423_b_v8_ae.jpg',
     status: 'watching',
     genres: ['Action', 'Adventure', 'Comedy']
   },
@@ -35,7 +35,7 @@ export const animeList: Anime[] = [
     rating: 7.7,
     season: 'Fall',
     year: 2024,
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
+    image: 'https://media.animationdigitalnetwork.com/images/show/e529ed60-9716-4162-a419-65395c2b3ac7/affiche.width=500,height=714,quality=70',
     status: 'watching',
     genres: ['Action', 'Adventure']
   },
@@ -48,7 +48,7 @@ export const animeList: Anime[] = [
     rating: 9.0,
     season: 'Fall',
     year: 2020,
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
+    image: 'https://m.media-amazon.com/images/M/MV5BNmI1MmYxNWQtY2E5NC00ZTlmLWIzZGEtNzM1YmE3NDA5NzhjXkEyXkFqcGc@._V1_FMjpg_UY3000_.jpg',
     status: 'watching',
     genres: ['Action', 'Supernatural']
   },
@@ -61,7 +61,7 @@ export const animeList: Anime[] = [
     rating: 9.4,
     season: 'Spring',
     year: 2024,
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
+    image: 'https://www.nautiljon.com/images/anime/00/09/kimetsu_no_yaiba_hashira_gou_kaigi_-_chouyashiki_hen_10290.webp',
     status: 'completed',
     genres: ['Action', 'Historical']
   },
@@ -74,7 +74,7 @@ export const animeList: Anime[] = [
     rating: 9.2,
     season: 'Spring',
     year: 2013,
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=400&fit=crop',
+    image: 'https://snworksceo.imgix.net/ttd/dd98cc9a-86ba-4ff5-8395-3084026f7efd.sized-1000x1000.jpg?w=1000&dpr=2',
     status: 'completed',
     genres: ['Action', 'Drama']
   }

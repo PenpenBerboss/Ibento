@@ -1,12 +1,11 @@
 {
   "expo": {
-    "name": "Minimal Expo App",
-    "slug": "minimal-expo-app",
+    "name": "IBENTO",
+    "slug": "ibento",
     "version": "1.0.0",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -21,8 +20,10 @@
       "output": "single"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
+    "scheme": "ibento",
     "experiments": {
       "typedRoutes": true
     }

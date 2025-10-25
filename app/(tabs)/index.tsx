@@ -1,76 +1,551 @@
-import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Sparkles, Heart, Users, TrendingUp } from 'lucide-react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, ScrollView, Image, TouchableOpacity, Dimensions, StatusBar, Animated, Easing } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { 
+  Compass, 
+  Users, 
+  Calendar, 
+  Video,
+  ListChecks,
+  TrendingUp,
+  MessageSquare,
+  Star,
+  MapPin,
+  Clock,
+  Menu,
+  Search,
+  Home
+} from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import * as Font from 'expo-font';
+import SmartImage from '../../components/SmartImage';
+import { privateChats } from './chats';
+
+const { width, height: screenHeight } = Dimensions.get('window');
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const slideAnim = useRef(new Animated.Value(0)).current; // 0 closed, 1 open
+  const HEADER_HEIGHT = Math.round(screenHeight * 0.45);
+  const bannerHeight = insets.top + HEADER_HEIGHT;
+
+  const featuredAnime = {
+    title: "Demon Slayer: Kimetsu no Yaiba",
+    image:
+      "https://media.gqmagazine.fr/photos/66a8c32ae836529d99eb2c28/16:9/w_1920,c_limit/Demon%20Slayer.jpg",
+    rating: 9.4,
+    members: "2.1M",
+    description:
+      "Le meilleur anime de la saison avec des combats épiques et une animation exceptionnelle.",
+  };
+
+  const upcomingEvents = [
+    {
+      id: '1',
+      title: "OTAKU 237 Convention",
+      image: "https://lebaneseotaku.com/assets/img/image-1.jpg",
+      date: "25 Nov 2025",
+      time: "10:00",
+      location: "Palais des Sports, Yaoundé",
+      description: "Le plus grand rassemblement otaku du Cameroun avec cosplay, gaming, et invités spéciaux.",
+      price: "5000 FCFA"
+    },
+    {
+      id: '2',
+      title: "Festival NGONDO 2025",
+      image: "https://showbook.africa/storage/676/20240911_175900-(3).jpg",
+      date: "15 Dec 2025",
+      time: "09:00",
+      location: "Bord du Wouri, Douala",
+      description: "Une célébration unique de la culture avec une exposition manga et anime spéciale.",
+      price: "Gratuit"
+    },
+    {
+      id: '3',
+      title: "Cinéma Anime Night",
+      image: "https://controlpanel.people237.com/wp-content/uploads/2024/12/emy-dany-bassong-film-rdc-people237.jpg",
+      date: "30 Oct 2025",
+      time: "19:00",
+      location: "Canal Olympia, Douala",
+      description: "Projection exclusive des derniers films d'animation japonais en avant-première.",
+      price: "3000 FCFA"
+    }
+  ];
+
+  const quickActions = [
+    {
+      icon: ListChecks,
+      label: "Ma Liste",
+      color: "#1e90ff",
+      route: "/my-list"
+    },
+    {
+      icon: Users,
+      label: "Communautés",
+      color: "#CC0000",
+      route: "/community"
+    },
+    {
+      icon: Video,
+      label: "Reels",
+      color: "#4ade80",
+      route: "/reels"
+    },
+    {
+      icon: Calendar,
+      label: "Événements",
+      color: "#fbbf24",
+      route: "/events"
+    }
+  ];
+
+  // Sample avatars for the 'Your Level' section
+  const communityAvatars = [
+    'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=80&h=80&fit=crop',
+    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop',
+    'https://images.unsplash.com/photo-1545996124-1b7a27b0a6f4?w=80&h=80&fit=crop',
+    'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=80&h=80&fit=crop',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop',
+    'https://images.unsplash.com/photo-1531123414780-fc3cf2e7b0a6?w=80&h=80&fit=crop'
+  ];
+
+  // Charger la police "Manga" depuis assets/fonts/Manga.ttf
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        await Font.loadAsync({
+          Manga: require('../../assets/fonts/Manga.ttf')
+        });
+        if (mounted) setFontsLoaded(true);
+      } catch (e) {
+        // Si la police n'est pas présente, on reste sur la police système
+        console.warn('Police Manga non trouvée. Placez le fichier Manga.ttf dans assets/fonts/');
+      }
+    }
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  const toggleDrawer = useCallback((open?: boolean) => {
+    const toValue = typeof open === 'boolean' ? (open ? 1 : 0) : (drawerOpen ? 0 : 1);
+    setDrawerOpen(prev => (typeof open === 'boolean' ? open : !prev));
+    Animated.timing(slideAnim, {
+      toValue,
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [drawerOpen, slideAnim]);
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView className="flex-1 px-6">
-        <View className="pt-8 pb-6">
-          <Text className="text-text text-3xl font-bold mb-2">
-            Welcome to Animeista
-          </Text>
-          <Text className="text-textSecondary text-lg">
-            Your ultimate anime & manga community
-          </Text>
+    <SafeAreaView
+      className="flex-1 bg-background"
+      edges={["left", "right", "bottom"]}
+    >
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
+
+      {/* Header fixe */}
+      <BlurView
+        intensity={80}
+        className="absolute top-0 left-0 right-0 z-10"
+        style={{ paddingTop: insets.top }}
+      >
+        <View className="h-14 flex-row items-center px-4">
+          <TouchableOpacity
+            className="w-10 h-10 items-center justify-center"
+            onPress={() => toggleDrawer(true)}
+          >
+            <Menu size={24} color="#fff" />
+          </TouchableOpacity>
+
+          <View className="flex-1 items-center">
+            <Text
+              className={`text-white text-3xl font-bold`}
+              style={fontsLoaded ? { fontFamily: "Manga" } : {}}
+            >
+              IBENTO
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            className="w-10 h-10 items-center justify-center"
+            onPress={() => {
+              /* TODO: Ouvrir la recherche */
+            }}
+          ></TouchableOpacity>
+        </View>
+      </BlurView>
+
+      {/* Drawer moderne et épuré */}
+      <Animated.View
+        pointerEvents={drawerOpen ? "auto" : "none"}
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          right: 0,
+          width: Math.min(320, width * 0.85),
+          transform: [
+            {
+              translateX: slideAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [Math.min(320, width * 0.85), 0],
+              }),
+            },
+          ],
+          opacity: slideAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 1],
+          }),
+          zIndex: 20,
+        }}
+      >
+        <BlurView intensity={20} className="flex-1">
+          <LinearGradient
+            colors={["rgba(30,144,255,0.1)", "rgba(204,0,0,0.05)"]}
+            className="flex-1 px-6 pt-4 pb-8"
+            style={{ paddingTop: insets.top }}
+          >
+            <View className="flex-row items-center justify-between mb-8">
+              <Text
+                className={`text-white text-2xl font-bold`}
+                style={fontsLoaded ? { fontFamily: "Manga" } : {}}
+              >
+                IBENTO
+              </Text>
+              <TouchableOpacity
+                onPress={() => toggleDrawer(false)}
+                className="w-8 h-8 items-center justify-center rounded-full bg-white/10"
+              >
+                <Text className="text-white text-lg">×</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Profile preview */}
+            <TouchableOpacity
+              className="flex-row items-center mb-8 p-3 rounded-2xl bg-black/20"
+              onPress={() => {
+                toggleDrawer(false);
+                router.push("/profile" as any);
+              }}
+            >
+              <Image
+                source={{
+                  uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+                }}
+                className="w-12 h-12 rounded-full"
+              />
+              <View className="ml-3 flex-1">
+                <Text className="text-white font-semibold">Penpen berboss</Text>
+                <Text className="text-white/60 text-sm">Voir le profil</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Items du menu avec icônes et effets */}
+            <View className="space-y-2">
+              {[
+                { icon: Home, label: "Accueil", route: "/" },
+                { icon: ListChecks, label: "Ma Liste", route: "/my-list" },
+                { icon: Users, label: "Communautés", route: "/community" },
+                { icon: Video, label: "Reels", route: "/reels" },
+                { icon: Calendar, label: "Événements", route: "/events" },
+              ].map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  className="flex-row items-center p-3 rounded-2xl bg-black/10 active:bg-black/20"
+                  style={{ transform: [{ scale: 1 }] }}
+                  onPress={() => {
+                    toggleDrawer(false);
+                    router.push(item.route as any);
+                  }}
+                >
+                  <View className="w-8 h-8 items-center justify-center rounded-full bg-black/20">
+                    <item.icon size={18} color="#fff" />
+                  </View>
+                  <Text className="text-white ml-3 font-medium">
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Footer avec version */}
+            <View className="mt-auto pt-8">
+              <Text className="text-white/40 text-sm text-center">
+                Version 1.0.0
+              </Text>
+            </View>
+          </LinearGradient>
+        </BlurView>
+      </Animated.View>
+
+      <ScrollView className="flex-1">
+        {/* Hero Section avec Featured Anime */}
+        <View
+          style={{ height: bannerHeight, backgroundColor: "#000" }}
+          className="relative items-center justify-center"
+        >
+          <SmartImage
+            source={featuredAnime.image}
+            style={{
+              width: "100%",
+              height: bannerHeight,
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
+            contain={false}
+          />
+          <LinearGradient
+            colors={["transparent", "rgba(0,0,0,0.35)", "rgba(0,0,0,0.85)"]}
+            locations={[0, 0.4, 1]}
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: 0,
+              height: bannerHeight,
+              paddingTop: insets.top,
+            }}
+          />
+          <View className="absolute bottom-0 w-full p-6">
+            <Text className="text-white text-3xl font-bold mb-2">
+              {featuredAnime.title}
+            </Text>
+            <Text className="text-white opacity-80 mb-4" numberOfLines={2}>
+              {featuredAnime.description}
+            </Text>
+            <View className="flex-row items-center space-x-4">
+              <View className="flex-row items-center">
+                <Star size={16} color="#fbbf24" />
+                <Text className="text-white ml-1">{featuredAnime.rating}</Text>
+              </View>
+              <View className="flex-row items-center">
+                <Users size={16} color="#fff" />
+                <Text className="text-white ml-1">{featuredAnime.members}</Text>
+              </View>
+            </View>
+          </View>
         </View>
 
-        <View className="space-y-6">
-          <View className="bg-surface rounded-2xl p-6">
-            <View className="flex-row items-center mb-4">
-              <Sparkles size={24} color="#1e90ff" />
-              <Text className="text-text text-xl font-semibold ml-3">
-                Discover
-              </Text>
+        {/* Create post + Your Level (modernized) */}
+        <View className="px-6 py-6 space-y-4">
+          {/* Create community post — dark, rounded */}
+          <View
+            className="rounded-2xl overflow-hidden"
+            style={{ elevation: 6 }}
+          >
+            <View
+              style={{ backgroundColor: "#0f1724" }}
+              className="p-3 flex-row items-center justify-between"
+            >
+              <View className="flex-row items-center space-x-3">
+                <TouchableOpacity
+                  onPress={() => router.push("/community/create" as any)}
+                  className="w-10 h-10 rounded-lg items-center justify-center"
+                  style={{ backgroundColor: "rgba(255,255,255,0.03)" }}
+                >
+                  <MessageSquare size={18} color="#f8fafc" />
+                </TouchableOpacity>
+                <Text className="text-white/70">Create community post...</Text>
+              </View>
+
+              <View className="flex-row items-center space-x-2">
+                <TouchableOpacity className="p-2 bg-white/6 rounded-md">
+                  <Feather name="image" size={18} color="#f8fafc" />
+                </TouchableOpacity>
+                <TouchableOpacity className="p-2 bg-white/6 rounded-md">
+                  <Feather name="smile" size={18} color="#f8fafc" />
+                </TouchableOpacity>
+              </View>
             </View>
-            <Text className="text-textSecondary text-base leading-6">
-              Explore thousands of anime and manga titles, create your personal lists, and connect with fellow otaku.
-            </Text>
           </View>
 
-          <View className="bg-surface rounded-2xl p-6">
-            <View className="flex-row items-center mb-4">
-              <Users size={24} color="#4ade80" />
-              <Text className="text-text text-xl font-semibold ml-3">
-                Community
-              </Text>
-            </View>
-            <Text className="text-textSecondary text-base leading-6">
-              Join groups, participate in discussions, and share your thoughts about your favorite series.
-            </Text>
-          </View>
+          {/* Your Level card — colorful and compact */}
+          <View style={{ borderRadius: 16, overflow: "hidden", elevation: 6 }}>
+            <LinearGradient colors={["#061225", "#0b1522"]} className="p-4">
+              <View className="flex-row items-center justify-between mb-3">
+                <View className="flex-row items-center">
+                  <Image
+                    source={require("../../assets/16.png")}
+                    style={{ width: 35, height: 35 }}
+                  />
+                  <Text className="text-white font-semibold ml-2">
+                    Your Level
+                  </Text>
+                </View>
 
-          <View className="bg-surface rounded-2xl p-6">
-            <View className="flex-row items-center mb-4">
-              <Heart size={24} color="#ef4444" />
-              <Text className="text-text text-xl font-semibold ml-3">
-                Track & Rate
-              </Text>
-            </View>
-            <Text className="text-textSecondary text-base leading-6">
-              Keep track of what you're watching, rate your favorites, and get personalized recommendations.
-            </Text>
-          </View>
+                <View className="flex-row items-center">
+                  <Text className="text-white font-bold text-lg mr-2">32</Text>
+                  <Image
+                    source={require("../../assets/15.png")}
+                    style={{ width: 27, height: 27 }}
+                  />
+                </View>
+              </View>
 
-          <View className="bg-surface rounded-2xl p-6">
-            <View className="flex-row items-center mb-4">
-              <TrendingUp size={24} color="#fbbf24" />
-              <Text className="text-text text-xl font-semibold ml-3">
-                Trending
-              </Text>
-            </View>
-            <Text className="text-textSecondary text-base leading-6">
-              Stay up to date with the latest releases, seasonal anime, and trending discussions.
-            </Text>
+              <View className="mb-2">
+                <View className="w-full h-2 bg-white/6 rounded-full overflow-hidden">
+                  <View
+                    style={{
+                      width: "78%",
+                      height: "100%",
+                      backgroundColor: "#fbbf24",
+                    }}
+                  />
+                </View>
+              </View>
+
+              <View className="flex-row justify-between items-center">
+                <Text className="text-white/60 text-sm">Exp</Text>
+                <Text className="text-white/60 text-sm">64,376/63,000</Text>
+              </View>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="pt-3"
+              >
+                {privateChats.slice(0, 8).map((c, idx) => (
+                  <TouchableOpacity
+                    key={c.id}
+                    onPress={() => router.push(`/chat/${c.id}` as any)}
+                    activeOpacity={0.8}
+                    style={{ marginLeft: idx === 0 ? 0 : -12, zIndex: 100 - idx, elevation: 100 - idx }}
+                  >
+                    <Image
+                      source={{ uri: c.user.avatar }}
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        borderWidth: 2,
+                        borderColor: "#061225",
+                      }}
+                    />
+                    {c.user.online && (
+                      <View
+                        style={{
+                          position: "absolute",
+                          right: -2,
+                          bottom: -2,
+                          width: 12,
+                          height: 12,
+                          borderRadius: 6,
+                          backgroundColor: "#4ade80",
+                          borderWidth: 2,
+                          borderColor: "#061225",
+                        }}
+                      />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </LinearGradient>
           </View>
         </View>
 
-        <View className="py-8">
-          <Text className="text-textSecondary text-center text-sm">
-            Start your anime journey today! 🚀
-          </Text>
+        {/* Événements à venir */}
+        <View className="px-6 pb-8">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-text text-lg font-bold">
+              Événements à venir
+            </Text>
+            <TouchableOpacity
+              onPress={() => router.push("/events")}
+              className="flex-row items-center"
+            >
+              <Text className="text-primary mr-2">Voir tout</Text>
+              <TrendingUp size={16} color="#1e90ff" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingRight: 20 }}
+          >
+            {upcomingEvents.map((event, index) => (
+              <TouchableOpacity
+                key={event.id}
+                onPress={() => router.push(`/events/${event.id}` as any)}
+                className="mr-4 bg-surface rounded-2xl overflow-hidden"
+                style={{
+                  width: width * 0.75,
+                  elevation: 2,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.08,
+                  shadowRadius: 4,
+                }}
+              >
+                <View className="relative">
+                  <SmartImage
+                    source={event.image}
+                    style={{ width: "100%", height: 140 }}
+                    contain={false}
+                  />
+                  <View className="absolute top-3 right-3">
+                    <BlurView
+                      intensity={80}
+                      className="rounded-full overflow-hidden"
+                    >
+                      <Text className="text-white text-xs px-3 py-1 font-medium">
+                        {event.price}
+                      </Text>
+                    </BlurView>
+                  </View>
+                </View>
+
+                <View className="p-4">
+                  <Text
+                    className="text-text text-lg font-bold mb-2"
+                    numberOfLines={1}
+                  >
+                    {event.title}
+                  </Text>
+
+                  <View className="flex-row items-center mb-3">
+                    <View className="flex-row items-center bg-primary/10 rounded-full px-2 py-1">
+                      <Clock size={14} color="#1e90ff" />
+                      <Text className="text-primary text-xs ml-1 font-medium">
+                        {event.date}
+                      </Text>
+                    </View>
+                    <Text className="text-textSecondary text-xs mx-2">•</Text>
+                    <Text className="text-textSecondary text-xs">
+                      {event.time}
+                    </Text>
+                  </View>
+
+                  <View className="flex-row items-center">
+                    <MapPin size={14} color="#64748b" />
+                    <Text
+                      className="text-textSecondary text-xs ml-1 flex-1"
+                      numberOfLines={1}
+                    >
+                      {event.location}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
+
+        {/* Espacement pour la barre de navigation */}
+        <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
   );

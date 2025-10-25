@@ -1,11 +1,23 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import SmartImage from '../components/SmartImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, Calendar, MapPin, Link as LinkIcon } from 'lucide-react-native';
+import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import UserBadge from '../components/UserBadge';
 
+const colors = {
+  background: '#FFFFFF',
+  surface: '#F9F9F9',
+  primary: '#1e90ff',
+  secondary: '#CC0000',
+  text: '#000000',
+  textSecondary: '#555555',
+};
+
 export default function ProfileScreen() {
+  const navigation = useNavigation();
   const recentActivity = [
     { type: 'completed', title: 'Attack on Titan Final Season', time: '2 hours ago' },
     { type: 'rated', title: 'Jujutsu Kaisen', rating: 9.0, time: '1 day ago' },
@@ -17,15 +29,33 @@ export default function ProfileScreen() {
       <ScrollView className="flex-1">
         {/* Header */}
         <View className="px-6 pt-4 pb-6">
-          <TouchableOpacity onPress={() => router.back()} className="mb-6">
-            <ChevronLeft size={24} color="#ffffff" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                try {
+                  // @ts-ignore
+                  if (navigation?.canGoBack && navigation.canGoBack()) {
+                    // @ts-ignore
+                    navigation.goBack();
+                    return;
+                  }
+                } catch (e) {
+                  // ignore
+                }
+
+                // fallback vers l'accueil
+                router.push('/');
+              }}
+              className="mb-6"
+            >
+              <Feather name="chevron-left" size={24} color={colors.text} />
+            </TouchableOpacity>
 
           {/* Profile Info */}
           <View className="items-center mb-8">
-            <Image 
+            <SmartImage
               source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face' }}
-              className="w-24 h-24 rounded-3xl mb-4"
+              style={{ width: 96, height: 96, borderRadius: 48, marginBottom: 16 }}
+              contain={false}
             />
             <Text className="text-text text-2xl font-bold mb-1">Adam</Text>
             <Text className="text-textSecondary text-lg mb-4">@adam</Text>
@@ -56,15 +86,15 @@ export default function ProfileScreen() {
             </Text>
             <View className="space-y-2">
               <View className="flex-row items-center">
-                <Calendar size={16} color="#a0a0a0" />
+                <Feather name="calendar" size={16} color={colors.textSecondary} />
                 <Text className="text-textSecondary text-sm ml-2">Joined March 2020</Text>
               </View>
               <View className="flex-row items-center">
-                <MapPin size={16} color="#a0a0a0" />
+                <Feather name="map-pin" size={16} color={colors.textSecondary} />
                 <Text className="text-textSecondary text-sm ml-2">Tokyo, Japan</Text>
               </View>
               <View className="flex-row items-center">
-                <LinkIcon size={16} color="#a0a0a0" />
+                <Feather name="link" size={16} color={colors.textSecondary} />
                 <Text className="text-primary text-sm ml-2">myanimelist.net/profile/adam</Text>
               </View>
             </View>

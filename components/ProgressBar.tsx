@@ -1,5 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
+const colors = {
+  background: '#FFFFFF',
+  surface: '#F9F9F9',
+  primary: '#1e90ff',
+  secondary: '#CC0000',
+  text: '#000000',
+  textSecondary: '#555555',
+};
 
 interface ProgressBarProps {
   current: number;
@@ -11,22 +19,25 @@ interface ProgressBarProps {
 export default function ProgressBar({ 
   current, 
   total, 
-  color = '#1e90ff', 
+  color = colors.primary, 
   height = 6 
 }: ProgressBarProps) {
   const percentage = Math.min((current / total) * 100, 100);
   
   return (
     <View 
-      className="bg-secondary rounded-full overflow-hidden"
-      style={{ height }}
+      className="rounded-full bg-surface overflow-hidden"
+      style={{
+        borderRadius: height,
+        height,
+      }}
     >
       <View 
-        className="rounded-full"
+        className="rounded-full bg-primary"
         style={{ 
           width: `${percentage}%`, 
           height: '100%',
-          backgroundColor: color 
+          backgroundColor: undefined, // dynamic color handled via inline prop when necessary
         }}
       />
     </View>

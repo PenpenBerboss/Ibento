@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useFrameworkReady } from '../hooks/useFrameworkReady';
+import { View } from 'react-native';
 import '../global.css'
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 
@@ -10,13 +10,10 @@ export default function RootLayout() {
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="my-list" />
-        <Stack.Screen name="profile" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="light" backgroundColor="#0f0f0f" />
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
+        <Slot />
+        <StatusBar style="dark" backgroundColor="#FFFFFF" />
+      </View>
     </>
   );
 }

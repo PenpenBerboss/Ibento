@@ -1,5 +1,13 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+const colors = {
+  background: '#FFFFFF',
+  surface: '#F9F9F9',
+  primary: '#1e90ff',
+  secondary: '#CC0000',
+  text: '#000000',
+  textSecondary: '#555555',
+};
 
 interface UserBadgeProps {
   points: number;

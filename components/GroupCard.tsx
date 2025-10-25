@@ -1,7 +1,16 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import { Users } from 'lucide-react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import SmartImage from './SmartImage';
+import { Feather } from '@expo/vector-icons';
 import { Group } from '../data/groups';
+const colors = {
+  background: '#FFFFFF',
+  surface: '#F9F9F9',
+  primary: '#1e90ff',
+  secondary: '#CC0000',
+  text: '#000000',
+  textSecondary: '#555555',
+};
 
 interface GroupCardProps {
   group: Group;
@@ -14,14 +23,14 @@ export default function GroupCard({ group, onPress }: GroupCardProps) {
       onPress={() => onPress?.(group.id)}
       className="bg-surface rounded-2xl overflow-hidden mb-4"
     >
-      <Image 
-        source={{ uri: group.image }} 
-        className="w-full h-32"
-        resizeMode="cover"
+      <SmartImage
+        source={group.image}
+        style={{ width: '100%', height: 128 }}
+        contain={false}
       />
       
       <View className="absolute top-2 left-2 bg-black/50 px-2 py-1 rounded-lg flex-row items-center">
-        <Users size={12} color="#ffffff" />
+  <Feather name="users" color="#ffffff" size={12} />
         <Text className="text-white text-xs ml-1">{group.members}</Text>
       </View>
       

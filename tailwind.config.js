@@ -4,16 +4,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#0f0f0f',
-        surface: '#1a1a1a',
+        background: '#FFFFFF',
+        surface: '#F9F9F9',
         primary: '#1e90ff',
-        secondary: '#2a2a2a',
-        text: '#ffffff',
-        textSecondary: '#a0a0a0',
+        secondary: '#CC0000',
+        text: '#000000',
+        textSecondary: '#555555',
         accent: '#1e90ff',
         success: '#4ade80',
         warning: '#fbbf24',
-        error: '#ef4444',
+        error: '#CC0000',
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
