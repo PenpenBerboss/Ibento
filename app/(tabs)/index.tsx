@@ -3,21 +3,7 @@ import { View, Text, ScrollView, Image, TouchableOpacity, Dimensions, StatusBar,
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { 
-  Compass, 
-  Users, 
-  Calendar, 
-  Video,
-  ListChecks,
-  TrendingUp,
-  MessageSquare,
-  Star,
-  MapPin,
-  Clock,
-  Menu,
-  Search,
-  Home
-} from 'lucide-react-native';
+import { Compass, Users, Calendar, Video, ListChecks, TrendingUp, MessageSquare, Star, MapPin, Clock, Menu, Search, Hop as Home } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Font from 'expo-font';
