@@ -417,19 +417,19 @@ export default function HomeScreen() {
                 showsHorizontalScrollIndicator={false}
                 className="pt-3"
               >
-                {privateChats.slice(0, 8).map((c, idx) => (
+                {privateChats.slice(0, 6).map((c, idx) => (
                   <TouchableOpacity
                     key={c.id}
                     onPress={() => router.push(`/chat/${c.id}` as any)}
                     activeOpacity={0.8}
-                    style={{ marginLeft: idx === 0 ? 0 : -12, zIndex: 100 - idx, elevation: 100 - idx }}
+                    style={{ marginLeft: idx === 0 ? 0 : -8, zIndex: 100 - idx }}
                   >
                     <Image
                       source={{ uri: c.user.avatar }}
                       style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 24,
+                        width: 40,
+                        height: 40,
+                        borderRadius: 20,
                         borderWidth: 2,
                         borderColor: "#061225",
                       }}
@@ -440,9 +440,9 @@ export default function HomeScreen() {
                           position: "absolute",
                           right: -2,
                           bottom: -2,
-                          width: 12,
-                          height: 12,
-                          borderRadius: 6,
+                          width: 10,
+                          height: 10,
+                          borderRadius: 5,
                           backgroundColor: "#4ade80",
                           borderWidth: 2,
                           borderColor: "#061225",
