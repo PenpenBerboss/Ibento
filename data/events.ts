@@ -36,7 +36,7 @@ export const upcomingEvents: Event[] = [
   {
     id: '2',
     name: 'Festival NGONDO 2025',
-    imageUrl: 'https://z-p3-scontent.fdla2-1.fna.fbcdn.net/v/t39.30808-6/486465153_1089579653197758_7198065998480040007_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=pNQFdA-APjAQ7kNvwEkwfFK&_nc_oc=Adl14GocZoQfoPh4vRedKk-kWJpyVGbQsz43CyKXbVKzcxkgv6nziE3RnYPUIUkUwjU&_nc_zt=23&_nc_ht=z-p3-scontent.fdla2-1.fna&_nc_gid=XqrsFT3fMdUuc_hCFDAEjw&oh=00_AfezVUeC4ZAidvxLD1kHVQ1wKlfZ8fsDw9VyU0iL8VmG0g&oe=6900D805',
+    imageUrl: 'https://i0.wp.com/tamtamdumboa.com/wp-content/uploads/2024/12/20241204_202635.jpg?resize=800%2C450&ssl=1',
     price: 'Gratuit',
     currency: '',
     type: 'upcoming',
