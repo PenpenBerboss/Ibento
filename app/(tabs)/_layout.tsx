@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { groups } from '../../data/groups';
-import { privateChats } from './chats';
+// import { groups } from '../../data/groups';
+// import { privateChats } from './chats';
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -102,7 +102,10 @@ export default function TabLayout() {
   );
 
   // Badge count dynamique basé sur le nombre de conversations non lues dans l'onglet "Chats"
-  const chatsBadgeCount = privateChats.filter((c) => c.lastMessage && c.lastMessage.unread).length;
+  // const chatsBadgeCount = Array.isArray(privateChats)
+  //   ? privateChats.filter((c) => c.lastMessage && c.lastMessage.unread).length
+  //   : 0;
+  const chatsBadgeCount = 0; // Temporairement désactivé
 
   // Floating Action Button (FAB) handler
   const onFabPress = (_e: GestureResponderEvent) => {

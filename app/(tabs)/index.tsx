@@ -8,7 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Font from 'expo-font';
 import SmartImage from '../../components/SmartImage';
-import { privateChats } from './chats';
+// import { privateChats } from './chats';
 
 const { width, height: screenHeight } = Dimensions.get('window');
 
@@ -403,15 +403,48 @@ export default function HomeScreen() {
                 showsHorizontalScrollIndicator={false}
                 className="pt-3"
               >
-                {privateChats.slice(0, 6).map((c, idx) => (
-                  <TouchableOpacity
-                    key={c.id}
-                    onPress={() => router.push(`/chat/${c.id}` as any)}
-                    activeOpacity={0.8}
-                    style={{ marginLeft: idx === 0 ? 0 : -8, zIndex: 100 - idx }}
+                {/* {privateChats.slice(0, 6).map((c, idx) => (
+                  // <TouchableOpacity
+                  //   key={c.id}
+                  //   onPress={() => router.push(`/chat/${c.id}` as any)}
+                  //   activeOpacity={0.8}
+                  //   style={{ marginLeft: idx === 0 ? 0 : -8, zIndex: 100 - idx }}
+                  // >
+                  //   <Image
+                  //     source={{ uri: c.user.avatar }}
+                  //     style={{
+                  //       width: 40,
+                  //       height: 40,
+                  //       borderRadius: 20,
+                  //       borderWidth: 2,
+                  //       borderColor: "#061225",
+                  //     }}
+                  //   />
+                  //   {c.user.online && (
+                  //     <View
+                  //       style={{
+                  //         position: "absolute",
+                  //         right: -2,
+                  //         bottom: -2,
+                  //         width: 10,
+                  //         height: 10,
+                  //         borderRadius: 5,
+                  //         backgroundColor: "#4ade80",
+                  //         borderWidth: 2,
+                  //         borderColor: "#061225",
+                  //       }}
+                  //     />
+                  //   )}
+                  // </TouchableOpacity>
+                ))} */}
+                {/* Avatars temporaires pour remplacer les chats */}
+                {[1, 2, 3, 4, 5, 6].map((idx) => (
+                  <View
+                    key={idx}
+                    style={{ marginLeft: idx === 1 ? 0 : -8, zIndex: 100 - idx }}
                   >
                     <Image
-                      source={{ uri: c.user.avatar }}
+                      source={{ uri: `https://i.pravatar.cc/150?img=${idx}` }}
                       style={{
                         width: 40,
                         height: 40,
@@ -420,7 +453,7 @@ export default function HomeScreen() {
                         borderColor: "#061225",
                       }}
                     />
-                    {c.user.online && (
+                    {idx <= 3 && (
                       <View
                         style={{
                           position: "absolute",
@@ -435,7 +468,7 @@ export default function HomeScreen() {
                         }}
                       />
                     )}
-                  </TouchableOpacity>
+                  </View>
                 ))}
               </ScrollView>
             </LinearGradient>
