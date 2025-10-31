@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StatusBar, Dimensions, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StatusBar, Dimensions, Platform, Pressable, Animated } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
@@ -36,12 +36,8 @@ export default function EventDetailsScreen() {
   }
 
   const handleRegistration = () => {
-    setIsRegistering(true);
-    // TODO: Implémenter la logique d'inscription
-    setTimeout(() => {
-      router.push('/register' as any);
-      setIsRegistering(false);
-    }, 500);
+    // rediriger vers la page d'inscription
+    router.push('/register' as any);
   };
 
   const goBack = () => {
@@ -198,15 +194,41 @@ export default function EventDetailsScreen() {
         intensity={80}
         className="absolute bottom-0 left-0 right-0 p-4 border-t border-background"
       >
-        <TouchableOpacity
-          className="bg-secondary py-4 rounded-xl flex-row justify-center items-center"
-          onPress={handleRegistration}
-          disabled={isRegistering}
-        >
-          <Text className="text-white font-bold text-lg">
-            {isRegistering ? "Inscription en cours..." : "S'inscrire maintenant"}
-          </Text>
-        </TouchableOpacity>
+        <View className="flex-row space-x-4">
+          {/* Inscription button */}
+          <Pressable
+            onPress={handleRegistration}
+            style={({ pressed }) => [{ flex: 1, transform: [{ scale: pressed ? 0.98 : 1 }], opacity: isRegistering ? 0.7 : 1 }]}
+          >
+            <Animated.View>
+              <LinearGradient
+                colors={['#1e90ff', '#0066cc']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="py-4 rounded-xl flex-row justify-center items-center"
+              >
+                <Text className="text-white font-bold text-lg">{isRegistering ? 'Inscription en cours...' : "S'inscrire maintenant"}</Text>
+              </LinearGradient>
+            </Animated.View>
+          </Pressable>
+
+          {/* Acheter le Pass button */}
+          <Pressable
+            onPress={() => router.push({ pathname: '/BuyPass', params: { eventId: String(id) } } as any)}
+            style={({ pressed }) => [{ flex: 1, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
+          >
+            <Animated.View>
+              <LinearGradient
+                colors={['#F3D27A', '#DAA520']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className="py-4 rounded-xl flex-row justify-center items-center"
+              >
+                <Text className="text-black font-bold text-lg">Acheter le Pass</Text>
+              </LinearGradient>
+            </Animated.View>
+          </Pressable>
+        </View>
       </BlurView>
     </SafeAreaView>
   );
