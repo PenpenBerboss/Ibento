@@ -71,12 +71,12 @@ export default function HomeScreen() {
       color: "#1e90ff",
       route: "/my-list"
     },
-    {
-      icon: Users,
-      label: "Communautés",
-      color: "#CC0000",
-      route: "/community"
-    },
+    // {
+    //   icon: Users,
+    //   label: "Communautés",
+    //   color: "#CC0000",
+    //   route: "/community"
+    // },
     {
       icon: Video,
       label: "Reels",
@@ -243,7 +243,7 @@ export default function HomeScreen() {
               {[
                 { icon: Home, label: "Accueil", route: "/" },
                 { icon: ListChecks, label: "Ma Liste", route: "/my-list" },
-                { icon: Users, label: "Communautés", route: "/community" },
+                // { icon: Users, label: "Communautés", route: "/community" },
                 { icon: Video, label: "Reels", route: "/reels" },
                 { icon: Calendar, label: "Événements", route: "/events" },
               ].map((item, index) => (

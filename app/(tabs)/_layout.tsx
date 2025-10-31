@@ -129,32 +129,38 @@ export default function TabLayout() {
         />
         <Tabs.Screen
           name="chats"
+          // options={{
+          //   title: "Chats",
+          //   tabBarLabel: "Chats",
+          //   tabBarIcon: ({ color, focused }) => (
+          //     // icône plus moderne et lisible
+          //     <TabBarIcon
+          //       name="message-text"
+          //       color={color}
+          //       focused={focused}
+          //       badgeCount={chatsBadgeCount}
+          //     />
+          //   ),
+          // }}
           options={{
-            title: "Chats",
-            tabBarLabel: "Chats",
-            tabBarIcon: ({ color, focused }) => (
-              // icône plus moderne et lisible
-              <TabBarIcon
-                name="message-text"
-                color={color}
-                focused={focused}
-                badgeCount={chatsBadgeCount}
-              />
-            ),
+            href: null, // Masque l'onglet
           }}
         />
         <Tabs.Screen
           name="community/index"
+          // options={{
+          //   title: "Communauté",
+          //   tabBarLabel: "Communauté",
+          //   tabBarIcon: ({ color, focused }) => (
+          //     <TabBarIcon
+          //       name="account-group-outline"
+          //       color={color}
+          //       focused={focused}
+          //     />
+          //   ),
+          // }}
           options={{
-            title: "Communauté",
-            tabBarLabel: "Communauté",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon
-                name="account-group-outline"
-                color={color}
-                focused={focused}
-              />
-            ),
+            href: null, // Masque l'onglet
           }}
         />
         <Tabs.Screen
