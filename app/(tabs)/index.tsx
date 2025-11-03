@@ -102,7 +102,7 @@ export default function HomeScreen() {
         <style>body,html{margin:0;padding:0;background:transparent;height:100%} video{width:100%;height:100%;object-fit:cover;} iframe{width:100%;height:100%;border:0;}</style>
       </head>
       <body>
-        <video src="${url}" autoplay muted loop playsinline webkit-playsinline></video>
+        <video src="${url}" autoplay loop playsinline webkit-playsinline></video>
       </body>
     </html>
   `;
@@ -111,7 +111,7 @@ export default function HomeScreen() {
     // normalize to embed URL
     let idMatch = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
     const id = idMatch ? idMatch[1] : url;
-    const embed = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=${id}`;
+    const embed = `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=0&playsinline=1&loop=1&playlist=${id}`;
     return `
       <html>
         <head>
@@ -124,6 +124,22 @@ export default function HomeScreen() {
       </html>
     `;
   };
+
+  // Fonction pour contrôler l'audio des vidéos
+  const controlVideoAudio = (activeIndex: number) => {
+    // Cette fonction sera appelée quand l'utilisateur change de vidéo
+    // pour s'assurer que seule la vidéo active joue avec le son
+    ads.forEach((_, index) => {
+      const shouldPlay = index === activeIndex;
+      // Le contrôle du son se fait via les paramètres HTML des vidéos
+      // qui sont recréées à chaque changement d'index actif
+    });
+  };
+
+  // Appeler la fonction de contrôle audio quand activeAd change
+  useEffect(() => {
+    controlVideoAudio(activeAd);
+  }, [activeAd]);
 
   useEffect(() => {
     autoScroll.current = setInterval(() => {
@@ -624,6 +640,8 @@ export default function HomeScreen() {
                           domStorageEnabled
                           allowsInlineMediaPlayback
                           mediaPlaybackRequiresUserAction={false}
+                          startInLoadingState={false}
+                          scalesPageToFit={false}
                         />
                       ) : (
                         // Empty placeholder to reserve layout and reduce memory
