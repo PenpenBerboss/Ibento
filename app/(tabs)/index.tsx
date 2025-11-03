@@ -33,7 +33,7 @@ import {
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
-import { WebView } from 'react-native-webview';
+import { Platform } from 'react-native';
 import * as Font from "expo-font";
 import SmartImage from "../../components/SmartImage";
 // import { privateChats } from './chats';
@@ -95,34 +95,11 @@ export default function HomeScreen() {
     return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
   };
 
-  const makeVideoHtml = (url: string) => `
-    <html>
-      <head>
-        <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
-        <style>body,html{margin:0;padding:0;background:transparent;height:100%} video{width:100%;height:100%;object-fit:cover;} iframe{width:100%;height:100%;border:0;}</style>
-      </head>
-      <body>
-        <video src="${url}" autoplay loop playsinline webkit-playsinline></video>
-      </body>
-    </html>
-  `;
-
-  const makeYouTubeHtml = (url: string) => {
+  const getYouTubeEmbedUrl = (url: string) => {
     // normalize to embed URL
     let idMatch = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
     const id = idMatch ? idMatch[1] : url;
-    const embed = `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=0&playsinline=1&loop=1&playlist=${id}`;
-    return `
-      <html>
-        <head>
-          <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
-          <style>body,html{margin:0;padding:0;background:transparent;height:100%} iframe{width:100%;height:100%;border:0;}</style>
-        </head>
-        <body>
-          <iframe src="${embed}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </body>
-      </html>
-    `;
+    return `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=0&playsinline=1&loop=1&playlist=${id}`;
   };
 
   // Fonction pour contrôler l'audio des vidéos
@@ -631,18 +608,41 @@ export default function HomeScreen() {
                   >
                     <View style={{ width: '100%', height: 210, position: 'relative' }}>
                       { (i === activeAd || Math.abs(i - activeAd) <= PRELOAD_NEIGHBORS) && ad.videoUrl ? (
-                        // Lazy-render WebView only for active slide and neighbors
-                        <WebView
-                          originWhitelist={["*"]}
-                          source={{ html: isYouTube(ad.videoUrl) ? makeYouTubeHtml(ad.videoUrl) : makeVideoHtml(ad.videoUrl) }}
-                          style={{ backgroundColor: 'transparent', width: '100%', height: '100%' }}
-                          javaScriptEnabled
-                          domStorageEnabled
-                          allowsInlineMediaPlayback
-                          mediaPlaybackRequiresUserAction={false}
-                          startInLoadingState={false}
-                          scalesPageToFit={false}
-                        />
+                        // Utiliser des éléments HTML natifs pour le web
+                        Platform.OS === 'web' ? (
+                          isYouTube(ad.videoUrl) ? (
+                            <iframe
+                              src={getYouTubeEmbedUrl(ad.videoUrl)}
+                              style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                border: 0,
+                                backgroundColor: 'transparent'
+                              }}
+                              allow="autoplay; encrypted-media"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <video
+                              src={ad.videoUrl}
+                              autoPlay
+                              loop
+                              playsInline
+                              muted={i !== activeAd}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                backgroundColor: 'transparent'
+                              }}
+                            />
+                          )
+                        ) : (
+                          // Pour les plateformes natives, garder une vue simple
+                          <View style={{ width: '100%', height: '100%', backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ color: '#fff' }}>Vidéo non disponible</Text>
+                          </View>
+                        )
                       ) : (
                         // Empty placeholder to reserve layout and reduce memory
                         <View style={{ width: '100%', height: '100%', backgroundColor: '#000' }} />
