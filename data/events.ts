@@ -13,11 +13,12 @@ export interface Event {
 
 export const categories = [
   { id: 'all', name: 'Tous' },
-  { id: 'manga', name: 'Manga & Anime' },
+  // 'manga' merged into 'otaku237'
   { id: 'cinema', name: 'Cinéma' },
   { id: 'festival', name: 'Festivals' },
   { id: 'salon', name: 'Salons' },
-  { id: 'otaku', name: 'OTAKU 237' }
+  { id: 'otaku237', name: 'OTAKU 237' },
+  { id: 'divertement', name: 'Divertement' }
 ];
 
 export const upcomingEvents: Event[] = [
@@ -28,7 +29,7 @@ export const upcomingEvents: Event[] = [
     price: '5000',
     currency: 'FCFA',
     type: 'upcoming',
-    category: 'manga',
+  category: 'otaku237',
     location: 'Palais des Congrès, Yaoundé',
     date: '2025-11-15',
     description: 'Le plus grand festival d\'anime et de manga au Cameroun avec des compétitions de cosplay et des ateliers de dessin manga.'
@@ -36,7 +37,7 @@ export const upcomingEvents: Event[] = [
   {
     id: '2',
     name: 'Festival NGONDO 2025',
-    imageUrl: 'https://z-p3-scontent.fdla2-1.fna.fbcdn.net/v/t39.30808-6/486465153_1089579653197758_7198065998480040007_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=pNQFdA-APjAQ7kNvwEkwfFK&_nc_oc=Adl14GocZoQfoPh4vRedKk-kWJpyVGbQsz43CyKXbVKzcxkgv6nziE3RnYPUIUkUwjU&_nc_zt=23&_nc_ht=z-p3-scontent.fdla2-1.fna&_nc_gid=XqrsFT3fMdUuc_hCFDAEjw&oh=00_AfezVUeC4ZAidvxLD1kHVQ1wKlfZ8fsDw9VyU0iL8VmG0g&oe=6900D805',
+    imageUrl: 'https://i0.wp.com/tamtamdumboa.com/wp-content/uploads/2024/12/20241204_202635.jpg?resize=800%2C450&ssl=1',
     price: 'Gratuit',
     currency: '',
     type: 'upcoming',
@@ -64,7 +65,7 @@ export const upcomingEvents: Event[] = [
     price: '2500',
     currency: 'FCFA',
     type: 'upcoming',
-    category: 'otaku',
+  category: 'otaku237',
     location: 'Institut Français, Yaoundé',
     date: '2025-10-30',
     description: 'Rassemblement des fans d\'anime et de culture japonaise au Cameroun avec des concours et des stands.'
@@ -100,7 +101,7 @@ export const upcomingEvents: Event[] = [
     price: '2000',
     currency: 'FCFA',
     type: 'upcoming',
-    category: 'manga',
+  category: 'otaku237',
     location: 'Salle des fêtes d\'Akwa, Douala',
     date: '2025-12-22',
     description: 'Concours de cosplay avec focus sur les personnages populaires de Demon Slayer et Jujutsu Kaisen.'
@@ -116,6 +117,43 @@ export const upcomingEvents: Event[] = [
     location: 'Limbe',
     date: '2026-02-10',
     description: 'Exposition d\'art contemporain incluant des œuvres inspirées des mangas et des comics.'
+  }
+  ,
+  {
+    id: '9',
+    name: 'Live Concert - Yaoundé Nights',
+    imageUrl: 'https://images.unsplash.com/photo-1485579149621-3123dd979885?auto=format&fit=crop&w=1200&q=60',
+    price: '2000',
+    currency: 'FCFA',
+    type: 'upcoming',
+    category: 'divertement',
+    location: 'Le Bercail, Yaoundé',
+    date: '2025-11-20',
+    description: 'Concert live avec des artistes locaux et DJ set pour une soirée dansante.'
+  },
+  {
+    id: '10',
+    name: 'Soirée Lounge - Rooftop',
+    imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=60',
+    price: '5000',
+    currency: 'FCFA',
+    type: 'upcoming',
+    category: 'divertement',
+    location: 'Rooftop Yaoundé',
+    date: '2025-12-01',
+    description: 'Soirée VIP avec cocktail et musique lounge.'
+  },
+  {
+    id: '11',
+    name: 'Dîner à thème - Saveurs du Monde',
+    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxp8Hio_ZGrD9WyIxbrpas5JNkHVRMcjri4P6wX0QRYREsv6pT_TCffoGp77dlx0KGdA8&usqp=CAU',
+    price: '15000',
+    currency: 'FCFA',
+    type: 'upcoming',
+    category: 'divertement',
+    location: 'Restaurant Le Gourmet, Douala',
+    date: '2025-11-30',
+    description: 'Dîner gastronomique avec menu dégustation et animation musicale.'
   }
 ];
 
@@ -137,7 +175,7 @@ export const featuredItems: FeaturedItem[] = [
     imageUrl: 'https://www.mangamag.fr/wp-content/uploads/2023/04/Jujutsu-Kaisen-saison-2-personnage-principaux-trio-1024x576.jpg',
     price: '3500',
     currency: 'FCFA',
-    category: 'manga',
+  category: 'otaku237',
     type: 'featured',
     description: 'Projection en avant-première des premiers épisodes de la saison 3'
   },
@@ -177,7 +215,7 @@ export const featuredItems: FeaturedItem[] = [
     imageUrl: 'https://a.storyblok.com/f/178900/4096x2303/186447a46e/one-piece-day-2023.jpg',
     price: '1500',
     currency: 'FCFA',
-    category: 'otaku',
+    category: 'otaku237',
     type: 'featured',
     description: 'Journée dédiée à l\'univers de One Piece avec cosplay et quiz'
   },
@@ -190,5 +228,16 @@ export const featuredItems: FeaturedItem[] = [
     category: 'salon',
     type: 'featured',
     description: 'Tournois de jeux vidéo et démonstrations de jeux inspirés d\'anime'
+  }
+  ,
+  {
+    id: '7',
+    name: 'DJ Night - Club Douala',
+    imageUrl: 'https://images.unsplash.com/photo-1506152983158-1f1b6f1a84fc?auto=format&fit=crop&w=1200&q=60',
+    price: '2500',
+    currency: 'FCFA',
+    category: 'divertement',
+    type: 'featured',
+    description: 'Soirée DJ avec artistes invités et performances live.'
   }
 ];

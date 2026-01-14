@@ -1,12 +1,25 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, Dimensions, StatusBar, Animated, Easing } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { 
-  Compass, 
-  Users, 
-  Calendar, 
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  StatusBar,
+  Animated,
+  Easing,
+} from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import {
+  Compass,
+  Users,
+  Calendar,
   Video,
   ListChecks,
   TrendingUp,
@@ -16,19 +29,110 @@ import {
   Clock,
   Menu,
   Search,
-  Home
-} from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import * as Font from 'expo-font';
-import SmartImage from '../../components/SmartImage';
-import { privateChats } from './chats';
+  Hop as Home,
+} from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
+import { Platform } from 'react-native';
+import * as Font from "expo-font";
+import SmartImage from "../../components/SmartImage";
+// import { privateChats } from './chats';
 
-const { width, height: screenHeight } = Dimensions.get('window');
+const { width, height: screenHeight } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const adsRef = useRef<any>(null);
+  const [activeAd, setActiveAd] = useState(0);
+  // Les annonces utilisent maintenant des vidéos distantes jouées localement via WebView (HTML5 video)
+  // Toutes les annonces utilisent maintenant des vidéos mp4 directes pour autoplay
+  const ads = [
+    {
+      id: "ad1",
+      title: "Discover the latest figures",
+      subtitle: "Exclusive discounts this week",
+      videoUrl:
+        "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+    },
+    {
+      id: "ad2",
+      title: "Time Lapse of Times Square",
+      subtitle: "Manhattan at rush hour",
+      videoUrl:
+        "https://media.istockphoto.com/id/866406672/video/time-lapse-of-times-square-new-york.mp4?s=mp4-640x640-is&k=20&c=ZDnqcSOO3-PyY3jihW-4TgesOd3CN7Qg9q2gSD_OJKA=",
+    },
+    {
+      id: "ad3",
+      title: "Social Network Concept",
+      subtitle:
+        "Social Network Concept with Blockchain Architecture Visualization",
+      videoUrl:
+        "https://media.istockphoto.com/id/1673647159/video/social-network-concept-with-blockchain-architecture-visualization-of-a-metaverse-big-data.mp4?s=mp4-640x640-is&k=20&c=uNLlw3GLRbpZKj2ZjZuEEoX_-ALGVlUlHH2pc6xQOJM=",
+    },
+    {
+      id: "ad4",
+      title: "Flux de médias sociaux",
+      subtitle: "Marketing en ligne et travail indépendant",
+      videoUrl:
+        "https://media.istockphoto.com/id/1495100481/fr/vid%C3%A9o/flux-de-m%C3%A9dias-sociaux-%C3%A0-d%C3%A9filement-de-la-main-f%C3%A9minine-sur-les-plateformes-m%C3%A9diatiques.mp4?s=mp4-640x640-is&k=20&c=jy_P3U91yNWVsTGloqqsFMKiLpYfVzupFQ7w0KZ6MZo=",
+    },
+    {
+      id: "ad5",
+      title: "technologieIntelligence artificielle",
+      subtitle: "Publicité, Moteur de recherche, publicité DigitalDisplay",
+      videoUrl:
+        "https://media.istockphoto.com/id/1945077529/fr/vid%C3%A9o/publicit%C3%A9-moteur-de-recherche-publicit%C3%A9-digitaldisplay-entreprise-technologieintelligence.mp4?s=mp4-640x640-is&k=20&c=JkxZ3oU2spelNMRUtsU-pExR2TjuRGKIZzYH_C7nKP4=",
+    },
+  ];
+  const autoScroll = useRef<any>(null);
+  const isDragging = useRef(false);
+  // number of neighbor slides to pre-render (0 = only active)
+  const PRELOAD_NEIGHBORS = 1;
+
+  const isYouTube = (url?: string) => {
+    if (!url) return false;
+    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
+  };
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    // normalize to embed URL
+    let idMatch = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+    const id = idMatch ? idMatch[1] : url;
+    return `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=0&playsinline=1&loop=1&playlist=${id}`;
+  };
+
+  // Fonction pour contrôler l'audio des vidéos
+  const controlVideoAudio = (activeIndex: number) => {
+    // Cette fonction sera appelée quand l'utilisateur change de vidéo
+    // pour s'assurer que seule la vidéo active joue avec le son
+    ads.forEach((_, index) => {
+      const shouldPlay = index === activeIndex;
+      // Le contrôle du son se fait via les paramètres HTML des vidéos
+      // qui sont recréées à chaque changement d'index actif
+    });
+  };
+
+  // Appeler la fonction de contrôle audio quand activeAd change
+  useEffect(() => {
+    controlVideoAudio(activeAd);
+  }, [activeAd]);
+
+  useEffect(() => {
+    autoScroll.current = setInterval(() => {
+      if (isDragging.current) return;
+      const next = (activeAd + 1) % ads.length;
+      const x = (width - 48) * next;
+      if (adsRef.current && adsRef.current.scrollTo) {
+        adsRef.current.scrollTo({ x, animated: true });
+      }
+      setActiveAd(next);
+    }, 7000); // 7s interval
+
+    return () => {
+      if (autoScroll.current) clearInterval(autoScroll.current);
+    };
+  }, [activeAd]);
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current; // 0 closed, 1 open
@@ -47,72 +151,76 @@ export default function HomeScreen() {
 
   const upcomingEvents = [
     {
-      id: '1',
+      id: "1",
       title: "OTAKU 237 Convention",
       image: "https://lebaneseotaku.com/assets/img/image-1.jpg",
       date: "25 Nov 2025",
       time: "10:00",
       location: "Palais des Sports, Yaoundé",
-      description: "Le plus grand rassemblement otaku du Cameroun avec cosplay, gaming, et invités spéciaux.",
-      price: "5000 FCFA"
+      description:
+        "Le plus grand rassemblement otaku du Cameroun avec cosplay, gaming, et invités spéciaux.",
+      price: "5000 FCFA",
     },
     {
-      id: '2',
+      id: "2",
       title: "Festival NGONDO 2025",
       image: "https://showbook.africa/storage/676/20240911_175900-(3).jpg",
       date: "15 Dec 2025",
       time: "09:00",
       location: "Bord du Wouri, Douala",
-      description: "Une célébration unique de la culture avec une exposition manga et anime spéciale.",
-      price: "Gratuit"
+      description:
+        "Une célébration unique de la culture avec une exposition manga et anime spéciale.",
+      price: "Gratuit",
     },
     {
-      id: '3',
+      id: "3",
       title: "Cinéma Anime Night",
-      image: "https://controlpanel.people237.com/wp-content/uploads/2024/12/emy-dany-bassong-film-rdc-people237.jpg",
+      image:
+        "https://controlpanel.people237.com/wp-content/uploads/2024/12/emy-dany-bassong-film-rdc-people237.jpg",
       date: "30 Oct 2025",
       time: "19:00",
       location: "Canal Olympia, Douala",
-      description: "Projection exclusive des derniers films d'animation japonais en avant-première.",
-      price: "3000 FCFA"
-    }
+      description:
+        "Projection exclusive des derniers films d'animation japonais en avant-première.",
+      price: "3000 FCFA",
+    },
   ];
 
   const quickActions = [
-    {
-      icon: ListChecks,
-      label: "Ma Liste",
-      color: "#1e90ff",
-      route: "/my-list"
-    },
-    {
-      icon: Users,
-      label: "Communautés",
-      color: "#CC0000",
-      route: "/community"
-    },
+    // {
+    //   icon: ListChecks,
+    //   label: "Ma Liste",
+    //   color: "#1e90ff",
+    //   route: "/my-list",
+    // },
+    // {
+    //   icon: Users,
+    //   label: "Communautés",
+    //   color: "#CC0000",
+    //   route: "/community"
+    // },
     {
       icon: Video,
       label: "Reels",
       color: "#4ade80",
-      route: "/reels"
+      route: "/reels",
     },
     {
       icon: Calendar,
       label: "Événements",
       color: "#fbbf24",
-      route: "/events"
-    }
+      route: "/events",
+    },
   ];
 
   // Sample avatars for the 'Your Level' section
   const communityAvatars = [
-    'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=80&h=80&fit=crop',
-    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop',
-    'https://images.unsplash.com/photo-1545996124-1b7a27b0a6f4?w=80&h=80&fit=crop',
-    'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=80&h=80&fit=crop',
-    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop',
-    'https://images.unsplash.com/photo-1531123414780-fc3cf2e7b0a6?w=80&h=80&fit=crop'
+    "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=80&h=80&fit=crop",
+    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop",
+    "https://images.unsplash.com/photo-1545996124-1b7a27b0a6f4?w=80&h=80&fit=crop",
+    "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=80&h=80&fit=crop",
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop",
+    "https://images.unsplash.com/photo-1531123414780-fc3cf2e7b0a6?w=80&h=80&fit=crop",
   ];
 
   // Charger la police "Manga" depuis assets/fonts/Manga.ttf
@@ -121,28 +229,36 @@ export default function HomeScreen() {
     async function load() {
       try {
         await Font.loadAsync({
-          Manga: require('../../assets/fonts/Manga.ttf')
+          Manga: require("../../assets/fonts/Manga.ttf"),
         });
         if (mounted) setFontsLoaded(true);
       } catch (e) {
         // Si la police n'est pas présente, on reste sur la police système
-        console.warn('Police Manga non trouvée. Placez le fichier Manga.ttf dans assets/fonts/');
+        console.warn(
+          "Police Manga non trouvée. Placez le fichier Manga.ttf dans assets/fonts/"
+        );
       }
     }
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const toggleDrawer = useCallback((open?: boolean) => {
-    const toValue = typeof open === 'boolean' ? (open ? 1 : 0) : (drawerOpen ? 0 : 1);
-    setDrawerOpen(prev => (typeof open === 'boolean' ? open : !prev));
-    Animated.timing(slideAnim, {
-      toValue,
-      duration: 300,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }, [drawerOpen, slideAnim]);
+  const toggleDrawer = useCallback(
+    (open?: boolean) => {
+      const toValue =
+        typeof open === "boolean" ? (open ? 1 : 0) : drawerOpen ? 0 : 1;
+      setDrawerOpen((prev) => (typeof open === "boolean" ? open : !prev));
+      Animated.timing(slideAnim, {
+        toValue,
+        duration: 300,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    },
+    [drawerOpen, slideAnim]
+  );
 
   return (
     <SafeAreaView
@@ -256,8 +372,8 @@ export default function HomeScreen() {
             <View className="space-y-2">
               {[
                 { icon: Home, label: "Accueil", route: "/" },
-                { icon: ListChecks, label: "Ma Liste", route: "/my-list" },
-                { icon: Users, label: "Communautés", route: "/community" },
+                // { icon: ListChecks, label: "Ma Liste", route: "/my-list" },
+                // { icon: Users, label: "Communautés", route: "/community" },
                 { icon: Video, label: "Reels", route: "/reels" },
                 { icon: Calendar, label: "Événements", route: "/events" },
               ].map((item, index) => (
@@ -346,7 +462,7 @@ export default function HomeScreen() {
             className="rounded-2xl overflow-hidden"
             style={{ elevation: 6 }}
           >
-            <View
+            {/* <View
               style={{ backgroundColor: "#0f1724" }}
               className="p-3 flex-row items-center justify-between"
             >
@@ -369,10 +485,13 @@ export default function HomeScreen() {
                   <Feather name="smile" size={18} color="#f8fafc" />
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
           </View>
 
-          {/* Your Level card — colorful and compact */}
+          {/*
+            Your Level card — colorful and compact
+            (commented out per request)
+
           <View style={{ borderRadius: 16, overflow: "hidden", elevation: 6 }}>
             <LinearGradient colors={["#061225", "#0b1522"]} className="p-4">
               <View className="flex-row items-center justify-between mb-3">
@@ -417,42 +536,147 @@ export default function HomeScreen() {
                 showsHorizontalScrollIndicator={false}
                 className="pt-3"
               >
-                {privateChats.slice(0, 8).map((c, idx) => (
-                  <TouchableOpacity
-                    key={c.id}
-                    onPress={() => router.push(`/chat/${c.id}` as any)}
-                    activeOpacity={0.8}
-                    style={{ marginLeft: idx === 0 ? 0 : -12, zIndex: 100 - idx, elevation: 100 - idx }}
-                  >
-                    <Image
-                      source={{ uri: c.user.avatar }}
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 24,
-                        borderWidth: 2,
-                        borderColor: "#061225",
-                      }}
-                    />
-                    {c.user.online && (
-                      <View
-                        style={{
-                          position: "absolute",
-                          right: -2,
-                          bottom: -2,
-                          width: 12,
-                          height: 12,
-                          borderRadius: 6,
-                          backgroundColor: "#4ade80",
-                          borderWidth: 2,
-                          borderColor: "#061225",
-                        }}
-                      />
-                    )}
-                  </TouchableOpacity>
-                ))}
+                Avatars temporarily commented out
               </ScrollView>
             </LinearGradient>
+          </View>
+
+          */}
+
+          {/* Modern Create Event card */}
+          <TouchableOpacity
+            onPress={() => router.push("/events/create" as any)}
+            activeOpacity={0.9}
+            style={{
+              borderRadius: 14,
+              overflow: "hidden",
+              backgroundColor: "#071224",
+              padding: 12,
+              elevation: 6,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: '#0b1220', alignItems: 'center', justifyContent: 'center' }}>
+                <Calendar size={20} color="#fff" />
+              </View>
+
+              <View style={{ marginLeft: 12 }}>
+                <Text style={{ color: "#fff", fontSize: 15, fontWeight: "700" }}>Create an event</Text>
+                <Text style={{ color: "#9ca3af", fontSize: 12, marginTop: 2 }}>Share location, date and details</Text>
+              </View>
+            </View>
+
+            {/* right side intentionally removed for a cleaner look */}
+          </TouchableOpacity>
+          {/* Sponsored Ads carousel */}
+          <View className="mt-4">
+            <Text className="text-textSecondary mb-3">Sponsored</Text>
+            <View style={{ height: 230 }}>
+              <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                ref={(r) => { adsRef.current = r as any; }}
+                onMomentumScrollEnd={(e) => {
+                  const idx = Math.round(e.nativeEvent.contentOffset.x / (width - 48));
+                  setActiveAd(idx);
+                }}
+                onScrollBeginDrag={() => { isDragging.current = true; if (autoScroll.current) clearInterval(autoScroll.current); }}
+                onScrollEndDrag={() => { isDragging.current = false; autoScroll.current = setInterval(() => {
+                  const next = (activeAd + 1) % ads.length;
+                  const x = (width - 48) * next;
+                  if (adsRef.current && adsRef.current.scrollTo) {
+                    adsRef.current.scrollTo({ x, animated: true });
+                  }
+                  setActiveAd(next);
+                }, 3000); }}
+              >
+                {ads.map((ad, i) => (
+                  <View
+                    key={ad.id}
+                    style={{
+                      width: width - 48,
+                      marginRight: 12,
+                      borderRadius: 12,
+                      overflow: 'hidden',
+                      backgroundColor: '#071025',
+                      elevation: 6,
+                    }}
+                  >
+                    <View style={{ width: '100%', height: 210, position: 'relative' }}>
+                      { (i === activeAd || Math.abs(i - activeAd) <= PRELOAD_NEIGHBORS) && ad.videoUrl ? (
+                        // Utiliser des éléments HTML natifs pour le web
+                        Platform.OS === 'web' ? (
+                          isYouTube(ad.videoUrl) ? (
+                            <iframe
+                              src={getYouTubeEmbedUrl(ad.videoUrl)}
+                              style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                border: 0,
+                                backgroundColor: 'transparent'
+                              }}
+                              allow="autoplay; encrypted-media"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <video
+                              src={ad.videoUrl}
+                              autoPlay
+                              loop
+                              playsInline
+                              muted={i !== activeAd}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                backgroundColor: 'transparent'
+                              }}
+                            />
+                          )
+                        ) : (
+                          // Pour les plateformes natives, garder une vue simple
+                          <View style={{ width: '100%', height: '100%', backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ color: '#fff' }}>Vidéo non disponible</Text>
+                          </View>
+                        )
+                      ) : (
+                        // Empty placeholder to reserve layout and reduce memory
+                        <View style={{ width: '100%', height: '100%', backgroundColor: '#000' }} />
+                      )}
+
+                      {/* Gradient overlay for better text readability */}
+                      <LinearGradient
+                        colors={["transparent", "rgba(0,0,0,0.25)", "rgba(0,0,0,0.7)"]}
+                        locations={[0, 0.5, 1]}
+                        style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+                      />
+
+                      {/* Sponsored badge */}
+                      <View style={{ position: 'absolute', left: 12, top: 12, backgroundColor: '#ffffff22', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 }}>
+                        <Text className="text-white text-xs font-semibold">Sponsored</Text>
+                      </View>
+
+                      {/* Title block */}
+                      <View style={{ position: 'absolute', left: 12, right: 12, bottom: 12 }}>
+                        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700', textShadowColor: 'rgba(0,0,0,0.6)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }}>{ad.title}</Text>
+                        <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 4 }}>{ad.subtitle}</Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+
+              {/* Pagination dots */}
+              <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
+                {ads.map((_, i) => (
+                  <View key={i} style={{ width: i === activeAd ? 10 : 8, height: i === activeAd ? 10 : 8, borderRadius: 6, marginHorizontal: 5, backgroundColor: i === activeAd ? '#f59e0b' : '#ffffff2a', transform: [{ scale: i === activeAd ? 1.05 : 1 }] }} />
+                ))}
+              </View>
+            </View>
           </View>
         </View>
 
@@ -460,7 +684,7 @@ export default function HomeScreen() {
         <View className="px-6 pb-8">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-text text-lg font-bold">
-              Événements à venir
+              Événements
             </Text>
             <TouchableOpacity
               onPress={() => router.push("/events")}

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Pressable, Animated, findNodeHandle } from 'react-native';
 import SmartImage from '../../components/SmartImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -21,6 +21,19 @@ const colors = {
 };
 
 export default function SettingsScreen() {
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('fr');
+  const [langButtonLayout, setLangButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const langButtonRef = useRef<any>(null);
+  const anim = useRef(new Animated.Value(0)).current; // 0 hidden, 1 visible
+  // animation for the language overlay (scale + fade)
+  useEffect(() => {
+    if (showLangMenu) {
+      Animated.spring(anim, { toValue: 1, friction: 8, useNativeDriver: true }).start();
+    } else {
+      Animated.timing(anim, { toValue: 0, duration: 120, useNativeDriver: true }).start();
+    }
+  }, [showLangMenu]);
   type SettingsItem = {
     icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
     label: string;
@@ -46,9 +59,7 @@ export default function SettingsScreen() {
           title: "Contenu",
           items: [
             { icon: 'heart-outline', label: 'Favoris', onPress: () => {} },
-            { icon: 'format-list-bulleted', label: 'Ma Liste', onPress: () => router.push('/my-list?from=settings') },
-            { icon: 'chart-bar', label: 'Statistiques', onPress: () => {} },
-            { icon: 'star-outline', label: 'Mes Avis', onPress: () => {} },
+            // { icon: 'format-list-bulleted', label: 'Ma Liste', onPress: () => router.push('/my-list?from=settings') },
           ]
         },
     {
@@ -65,8 +76,8 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="flex-1">
-        {/* En-tête avec profil */}
-        <View className="px-6 pt-4 pb-6">
+  {/* En-tête avec profil */}
+  <View className="px-6 pt-4 pb-6" style={{ position: 'relative' }}>
           <View className="flex-row items-center space-x-4 mb-6">
             <SmartImage
               source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face' }}
@@ -82,7 +93,7 @@ export default function SettingsScreen() {
             </View>
             <TouchableOpacity 
               className="p-2 bg-surface rounded-full"
-              onPress={() => {}}
+              onPress={() => { router.push('/profile' as any); }}
             >
               <MaterialCommunityIcons 
                 name="pencil-outline" 
@@ -93,49 +104,122 @@ export default function SettingsScreen() {
           </View>
 
           {/* Sections de paramètres */}
-          {settingsGroups.map((group, groupIndex) => (
+            {settingsGroups.map((group, groupIndex) => (
             <View key={groupIndex} className="mb-8">
               <Text className="text-primary text-lg font-bold mb-4 border-l-4 border-primary pl-3">
                 {group.title}
               </Text>
               <View className="space-y-2">
-                {group.items.map((item, itemIndex) => (
-                  <TouchableOpacity
-                    key={itemIndex}
-                    onPress={item.onPress}
-                    className="bg-surface rounded-2xl p-4 flex-row items-center justify-between"
-                  >
-                    <View className="flex-row items-center flex-1">
-                      <View className="w-8">
-                        <MaterialCommunityIcons 
-                          name={item.icon} 
-                          size={24} 
-                          color={colors.text} 
-                        />
-                      </View>
-                      <Text className="text-text font-medium flex-1 ml-3">
-                        {item.label}
-                      </Text>
-                    </View>
-                    <View className="flex-row items-center">
-                      {item.badge && (
-                        <View className="bg-error rounded-full w-6 h-6 items-center justify-center mr-3">
-                          <Text className="text-white text-xs font-bold">
-                            {item.badge}
+                  {group.items.map((item, itemIndex) => {
+                    // Special case: Langue button should open an overlay menu
+                    if (item.label === 'Langue') {
+                      return (
+                        <Pressable
+                          key={itemIndex}
+                          ref={langButtonRef}
+                          onPress={async () => {
+                            // measure absolute position
+                            try {
+                              const handle = findNodeHandle(langButtonRef.current);
+                              if (handle) {
+                                // @ts-ignore
+                                langButtonRef.current.measureInWindow((x: number, y: number, width: number, height: number) => {
+                                  setLangButtonLayout({ x, y, width, height });
+                                  setShowLangMenu(true);
+                                });
+                              } else {
+                                setShowLangMenu(true);
+                              }
+                            } catch (e) {
+                              setShowLangMenu(true);
+                            }
+                          }}
+                          style={{ borderRadius: 12 }}
+                        >
+                          <View className="bg-surface rounded-2xl p-4 flex-row items-center justify-between">
+                            <View className="flex-row items-center flex-1">
+                              <View className="w-8">
+                                <MaterialCommunityIcons 
+                                  name={item.icon} 
+                                  size={24} 
+                                  color={colors.text} 
+                                />
+                              </View>
+                              <Text className="text-text font-medium flex-1 ml-3">
+                                {item.label}
+                              </Text>
+                            </View>
+                            <View className="flex-row items-center">
+                              {item.badge && (
+                                <View className="bg-error rounded-full w-6 h-6 items-center justify-center mr-3">
+                                  <Text className="text-white text-xs font-bold">
+                                    {item.badge}
+                                  </Text>
+                                </View>
+                              )}
+                              <MaterialCommunityIcons 
+                                name="chevron-right" 
+                                size={20} 
+                                color={colors.textSecondary} 
+                              />
+                            </View>
+                          </View>
+                        </Pressable>
+                      );
+                    }
+
+                    return (
+                      <TouchableOpacity
+                        key={itemIndex}
+                        onPress={item.onPress}
+                        className="bg-surface rounded-2xl p-4 flex-row items-center justify-between"
+                      >
+                        <View className="flex-row items-center flex-1">
+                          <View className="w-8">
+                            <MaterialCommunityIcons 
+                              name={item.icon} 
+                              size={24} 
+                              color={colors.text} 
+                            />
+                          </View>
+                          <Text className="text-text font-medium flex-1 ml-3">
+                            {item.label}
                           </Text>
                         </View>
-                      )}
-                      <MaterialCommunityIcons 
-                        name="chevron-right" 
-                        size={20} 
-                        color={colors.textSecondary} 
-                      />
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                        <View className="flex-row items-center">
+                          {item.badge && (
+                            <View className="bg-error rounded-full w-6 h-6 items-center justify-center mr-3">
+                              <Text className="text-white text-xs font-bold">
+                                {item.badge}
+                              </Text>
+                            </View>
+                          )}
+                          <MaterialCommunityIcons 
+                            name="chevron-right" 
+                            size={20} 
+                            color={colors.textSecondary} 
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
               </View>
             </View>
           ))}
+
+            {/* Overlay de sélection de langue */}
+            {showLangMenu && langButtonLayout && (
+              <Pressable
+                style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, zIndex: 50 }}
+                onPress={() => setShowLangMenu(false)}
+              >
+                <Animated.View style={{ position: 'absolute', left: langButtonLayout.x, top: langButtonLayout.y + langButtonLayout.height + 4, backgroundColor: '#fff', borderRadius: 10, padding: 8, elevation: 12, minWidth: Math.max(160, langButtonLayout.width), zIndex: 60, shadowColor: '#000', shadowOpacity: 0.12, shadowOffset: { width: 0, height: 6 }, shadowRadius: 12, transform: [{ scale: anim }], opacity: anim }}>
+                  <TouchableOpacity onPress={() => { setSelectedLanguage('fr'); setShowLangMenu(false); }} style={{ paddingVertical: 8, paddingHorizontal: 10 }}>
+                    <Text style={{ fontWeight: selectedLanguage === 'fr' ? '700' : '500' }}>Français</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </Pressable>
+            )}
         </View>
         
         {/* Espace pour la barre de navigation */}

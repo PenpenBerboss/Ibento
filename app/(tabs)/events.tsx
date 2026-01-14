@@ -11,6 +11,7 @@ import SectionHeader from '../../components/SectionHeader';
 import CategoryFilter from '../../components/CategoryFilter';
 import { LinearGradient } from 'expo-linear-gradient';
 import SmartImage from '../../components/SmartImage';
+// ...existing code...
 
 export default function EventsScreen() {
   const router = useRouter();
@@ -47,20 +48,57 @@ export default function EventsScreen() {
     }
   }, [selectedCategory]);
 
+  // --- Nouveau: grouper les événements à venir par mois pour la section "À ne pas manquer"
+  const groupEventsByMonth = (eventsList: typeof upcomingEvents, monthsAhead = 3) => {
+    const groups: { title: string; events: typeof upcomingEvents }[] = [];
+    const now = new Date();
+
+    for (let m = 0; m < monthsAhead; m++) {
+      const dt = new Date(now.getFullYear(), now.getMonth() + m, 1);
+      const month = dt.getMonth();
+      const year = dt.getFullYear();
+      const title = dt.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+
+      const eventsInMonth = eventsList.filter(ev => {
+        if (!ev.date) return false;
+        const evDate = new Date(ev.date);
+        return evDate.getMonth() === month && evDate.getFullYear() === year;
+      });
+
+      groups.push({ title, events: eventsInMonth as typeof upcomingEvents });
+    }
+
+    return groups;
+  };
+
+  // build month options for a selector (next N months)
+  const buildMonthOptions = (monthsAhead = 6) => {
+    const now = new Date();
+    const opts: { key: string; label: string; date: Date }[] = [{ key: 'all', label: 'Tous', date: now }];
+    for (let i = 0; i < monthsAhead; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      opts.push({ key: `${d.getFullYear()}-${d.getMonth() + 1}`, label: d.toLocaleString('fr-FR', { month: 'short', year: 'numeric' }), date: d });
+    }
+    return opts;
+  };
+
+  const monthOptions = buildMonthOptions(6);
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+
   // Fonction pour obtenir l'image de bannière selon la catégorie
   const getBannerImage = () => {
-    switch(selectedCategory) {
-      case 'manga': 
+    switch (selectedCategory) {
+      case "otaku":
         return "https://www.pixground.com/wp-content/uploads/2023/05/Yoriichi-Tsugikuni-Demon-Slayer-4K-Anime-Wallpaper-1081x608.jpg";
-      case 'cinema': 
+      case "cinema":
         return "https://controlpanel.people237.com/wp-content/uploads/2024/12/emy-dany-bassong-film-rdc-people237.jpg";
-      case 'festival': 
+      case "festival":
         return "https://showbook.africa/storage/676/20240911_175900-(3).jpg";
-      case 'salon': 
+      case "salon":
         return "https://i0.wp.com/lyon.citycrunch.fr/wp-content/uploads/sites/3/2025/09/499141996_10160522872361213_1073844037725864236_n.jpg?fit=2048%2C1365&ssl=1";
-      case 'otaku': 
-        return "https://lebaneseotaku.com/assets/img/image-1.jpg";
-      default: 
+      case "divertement":
+        return "https://www.pixground.com/wp-content/uploads/2023/05/Yoriichi-Tsugikuni-Demon-Slayer-4K-Anime-Wallpaper-1081x608.jpg";
+      default:
         return "https://img.20mn.fr/6cHVD9cKQfus1TNgY_8teQ/1444x920_illustration-participants-japan-expo-2017-villepinte.jpg";
     }
   };
@@ -173,29 +211,102 @@ export default function EventsScreen() {
           )}
         </View>
         
-        {/* Featured Items Section */}
+        {/* Featured / À ne pas manquer Section (grouped by month) */}
         <View className="px-4 mb-6">
           <SectionHeader 
             title="À ne pas manquer" 
             onSeeAll={() => console.log("Voir tous les articles")} 
           />
-          
-          <View className="mt-2">
-            {filteredFeaturedItems.length > 0 ? (
-              filteredFeaturedItems.map((item) => (
-                <FeaturedItemCard
-                  key={item.id}
-                  item={item}
-                  onPress={(id) => console.log('Selected item:', id)}
-                />
-              ))
+
+          {/* Month selector (Tous + next months) - clean, pill buttons */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-3" contentContainerStyle={{ paddingLeft: 4, paddingRight: 8 }}>
+            {monthOptions.map(opt => {
+              const active = selectedMonth === opt.key;
+              return (
+                <TouchableOpacity
+                  key={opt.key}
+                  onPress={() => setSelectedMonth(opt.key)}
+                  style={{
+                    paddingVertical: 8,
+                    paddingHorizontal: 14,
+                    marginRight: 8,
+                    borderRadius: 20,
+                    backgroundColor: active ? '#2b2b2b' : 'transparent',
+                    borderWidth: active ? 0 : 1,
+                    borderColor: 'rgba(255,255,255,0.08)'
+                  }}
+                >
+                  <Text style={{ color: active ? 'white' : '#cfcfcf', fontWeight: active ? '700' : '500' }}>{opt.label}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          <View className="mt-3">
+            {selectedCategory === 'all' ? (
+              // When viewing all categories, show upcoming events grouped by month for the next 3 months
+              groupEventsByMonth(upcomingEvents, 3)
+                .map((group) => ({ ...group, key: group.title }))
+                .filter(group => {
+                  if (selectedMonth === 'all') return true;
+                  // compare group title month/year with selectedMonth key
+                  const [y, m] = selectedMonth.split('-');
+                  if (!y || !m) return true;
+                  const groupDate = new Date(group.events[0]?.date || `${y}-${m}-01`);
+                  return `${groupDate.getFullYear()}-${groupDate.getMonth() + 1}` === selectedMonth;
+                })
+                .map((group) => (
+                  <View key={group.key} className="mb-4">
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <Text style={{ fontSize: 16, fontWeight: '700' }}>{group.title}</Text>
+                      <View style={{ backgroundColor: '#ff6b6b', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 12 }}>
+                        <Text style={{ color: 'white', fontWeight: '700' }}>{group.events.length} évts</Text>
+                      </View>
+                    </View>
+
+                    {group.events.length > 0 ? (
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 16 }}>
+                        {group.events.map(ev => (
+                          <View key={ev.id} style={{ width: 260, marginRight: 12, borderRadius: 12, overflow: 'hidden', backgroundColor: '#fff', elevation: 2 }}>
+                            <SmartImage source={ev.imageUrl} style={{ width: '100%', height: 140 }} contain={false} />
+                            <View style={{ padding: 10 }}>
+                              <Text style={{ fontSize: 15, fontWeight: '700', marginBottom: 4 }}>{ev.name}</Text>
+                              <Text style={{ color: '#6b6b6b', marginBottom: 6 }}>{ev.location}</Text>
+                              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Text style={{ fontWeight: '700' }}>{ev.price ? `${ev.price} ${ev.currency}` : 'Gratuit'}</Text>
+                                <TouchableOpacity onPress={() => router.push(`/event-details/${ev.id}?from=events` as any)} style={{ backgroundColor: '#111827', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 10 }}>
+                                  <Text style={{ color: 'white', fontWeight: '700' }}>Voir</Text>
+                                </TouchableOpacity>
+                              </View>
+                            </View>
+                          </View>
+                        ))}
+                      </ScrollView>
+                    ) : (
+                      <View className="p-3 rounded-lg bg-surface">
+                        <Text className="text-textSecondary">Aucun événement prévu pour cette période</Text>
+                      </View>
+                    )}
+                  </View>
+                ))
             ) : (
-              <View className="p-4 justify-center items-center">
-                <Feather name="star" size={40} color="#ccc" />
-                <Text className="text-textSecondary mt-2 text-center">
-                  Aucun contenu en vedette dans cette catégorie
-                </Text>
-              </View>
+              // For a selected category, fallback to featured items as before
+              filteredFeaturedItems.length > 0 ? (
+                filteredFeaturedItems.map((item) => (
+                  <FeaturedItemCard
+                    key={item.id}
+                    item={item}
+                    onPress={(id) => console.log('Selected item:', id)}
+                  />
+                ))
+              ) : (
+                <View className="p-4 justify-center items-center">
+                  <Feather name="star" size={40} color="#ccc" />
+                  <Text className="text-textSecondary mt-2 text-center">
+                    Aucun contenu en vedette dans cette catégorie
+                  </Text>
+                </View>
+              )
             )}
           </View>
         </View>

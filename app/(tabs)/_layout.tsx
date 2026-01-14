@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { groups } from '../../data/groups';
-import { privateChats } from './chats';
+// import { groups } from '../../data/groups';
+// import { privateChats } from './chats';
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -102,9 +102,10 @@ export default function TabLayout() {
   );
 
   // Badge count dynamique basé sur le nombre de conversations non lues dans l'onglet "Chats"
-  const chatsBadgeCount = Array.isArray(privateChats)
-    ? privateChats.filter((c) => c.lastMessage && c.lastMessage.unread).length
-    : 0;
+  // const chatsBadgeCount = Array.isArray(privateChats)
+  //   ? privateChats.filter((c) => c.lastMessage && c.lastMessage.unread).length
+  //   : 0;
+  const chatsBadgeCount = 0; // Temporairement désactivé
 
   // Floating Action Button (FAB) handler
   const onFabPress = (_e: GestureResponderEvent) => {
@@ -128,32 +129,38 @@ export default function TabLayout() {
         />
         <Tabs.Screen
           name="chats"
+          // options={{
+          //   title: "Chats",
+          //   tabBarLabel: "Chats",
+          //   tabBarIcon: ({ color, focused }) => (
+          //     // icône plus moderne et lisible
+          //     <TabBarIcon
+          //       name="message-text"
+          //       color={color}
+          //       focused={focused}
+          //       badgeCount={chatsBadgeCount}
+          //     />
+          //   ),
+          // }}
           options={{
-            title: "Chats",
-            tabBarLabel: "Chats",
-            tabBarIcon: ({ color, focused }) => (
-              // icône plus moderne et lisible
-              <TabBarIcon
-                name="message-text"
-                color={color}
-                focused={focused}
-                badgeCount={chatsBadgeCount}
-              />
-            ),
+            href: null, // Masque l'onglet
           }}
         />
         <Tabs.Screen
           name="community/index"
+          // options={{
+          //   title: "Communauté",
+          //   tabBarLabel: "Communauté",
+          //   tabBarIcon: ({ color, focused }) => (
+          //     <TabBarIcon
+          //       name="account-group-outline"
+          //       color={color}
+          //       focused={focused}
+          //     />
+          //   ),
+          // }}
           options={{
-            title: "Communauté",
-            tabBarLabel: "Communauté",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon
-                name="account-group-outline"
-                color={color}
-                focused={focused}
-              />
-            ),
+            href: null, // Masque l'onglet
           }}
         />
         <Tabs.Screen
