@@ -33,3 +33,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# firebase
+scripts/serviceAccount.json
+scripts/*.json
+.idea/

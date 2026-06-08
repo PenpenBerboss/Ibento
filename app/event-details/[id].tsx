@@ -7,14 +7,10 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Share2, Calendar, Clock, MapPin, Users, ChevronLeft } from 'lucide-react-native';
 import SmartImage from '../../components/SmartImage';
-import { Event, upcomingEvents } from '../../data/events';
+import { Event } from '../../data/events';
+import { useEventsStore } from '../../hooks/useEventsStore';
 
 const { width, height: screenHeight } = Dimensions.get('window');
-
-// Simulation d'un appel API pour obtenir les détails de l'événement
-const getEventDetails = (id: string): Event | undefined => {
-  return upcomingEvents.find(event => event.id === id);
-};
 
 export default function EventDetailsScreen() {
   const router = useRouter();
@@ -24,8 +20,13 @@ export default function EventDetailsScreen() {
   const HEADER_HEIGHT = Math.round(screenHeight * 0.45);
   const bannerHeight = insets.top + HEADER_HEIGHT;
   
-  const event = getEventDetails(id as string);
+  const { getEvent } = useEventsStore();
+  const [event, setEvent] = useState<Event | null>(null);
   const [isRegistering, setIsRegistering] = useState(false);
+
+  React.useEffect(() => {
+    getEvent(id as string).then(setEvent);
+  }, [id]);
 
   if (!event) {
     return (

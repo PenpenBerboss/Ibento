@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Pressable, Animated, findNodeHandle } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Pressable, Animated, findNodeHandle, Alert } from 'react-native';
 import SmartImage from '../../components/SmartImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import UserBadge from '../../components/UserBadge';
+import { useAuthStore } from '@/hooks/useAuthStore';
 
 // Utilisation des couleurs de tailwind.config.js
 const colors = {
@@ -21,11 +22,30 @@ const colors = {
 };
 
 export default function SettingsScreen() {
+  const { user, logout } = useAuthStore();
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('fr');
   const [langButtonLayout, setLangButtonLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const langButtonRef = useRef<any>(null);
   const anim = useRef(new Animated.Value(0)).current; // 0 hidden, 1 visible
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Déconnexion',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        { text: 'Annuler', onPress: () => {}, style: 'cancel' },
+        {
+          text: 'Déconnexion',
+          onPress: async () => {
+            await logout();
+            router.replace('/login' as any);
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
   // animation for the language overlay (scale + fade)
   useEffect(() => {
     if (showLangMenu) {
@@ -63,14 +83,20 @@ export default function SettingsScreen() {
           ]
         },
     {
-      title: "Paramètres",
-      items: [
-        { icon: 'theme-light-dark', label: 'Thème', onPress: () => {} },
-        { icon: 'translate', label: 'Langue', onPress: () => {} },
-        { icon: 'help-circle-outline', label: 'Aide', onPress: () => {} },
-        { icon: 'information-outline', label: 'À propos', onPress: () => {} },
-      ]
-    }
+       title: "Paramètres",
+       items: [
+         { icon: 'theme-light-dark', label: 'Thème', onPress: () => {} },
+         { icon: 'translate', label: 'Langue', onPress: () => {} },
+         { icon: 'help-circle-outline', label: 'Aide', onPress: () => {} },
+         { icon: 'information-outline', label: 'À propos', onPress: () => {} },
+       ]
+     },
+    {
+       title: "Sécurité",
+       items: [
+         { icon: 'logout', label: 'Se déconnecter', onPress: handleLogout },
+       ]
+     }
   ];
 
   return (
@@ -78,30 +104,30 @@ export default function SettingsScreen() {
       <ScrollView className="flex-1">
   {/* En-tête avec profil */}
   <View className="px-6 pt-4 pb-6" style={{ position: 'relative' }}>
-          <View className="flex-row items-center space-x-4 mb-6">
-            <SmartImage
-              source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face' }}
-              style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: '#1e90ff' }}
-              contain={false}
-            />
-            <View className="flex-1">
-              <Text className="text-text text-xl font-bold">Penpen berboss</Text>
-              <Text className="text-textSecondary text-sm">@berboss</Text>
-              <View className="mt-2">
-                <UserBadge points={514} level={32} />
-              </View>
-            </View>
-            <TouchableOpacity 
-              className="p-2 bg-surface rounded-full"
-              onPress={() => { router.push('/profile' as any); }}
-            >
-              <MaterialCommunityIcons 
-                name="pencil-outline" 
-                size={24} 
-                color={colors.primary} 
-              />
-            </TouchableOpacity>
-          </View>
+    <View className="flex-row items-center space-x-4 mb-6">
+      <SmartImage
+        source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face' }}
+        style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: '#1e90ff' }}
+        contain={false}
+      />
+      <View className="flex-1">
+      <Text className="text-text text-xl font-bold">{user ? `${user.firstName} ${user.lastName}` : 'Utilisateur'}</Text>
+      <Text className="text-textSecondary text-sm">{user?.email || '@utilisateur'}</Text>
+        <View className="mt-2">
+          <UserBadge points={514} level={32} />
+        </View>
+      </View>
+      <TouchableOpacity 
+        className="p-2 bg-surface rounded-full"
+        onPress={() => { router.push('/profile' as any); }}
+      >
+        <MaterialCommunityIcons 
+          name="pencil-outline" 
+          size={24} 
+          color={colors.primary} 
+        />
+      </TouchableOpacity>
+    </View>
 
           {/* Sections de paramètres */}
             {settingsGroups.map((group, groupIndex) => (

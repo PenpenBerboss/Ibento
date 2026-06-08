@@ -4,7 +4,8 @@ import * as Font from 'expo-font';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { upcomingEvents, featuredItems, categories } from '../../data/events';
+import { featuredItems, categories } from '../../data/events';
+import { useEventsStore } from '../../hooks/useEventsStore';
 import EventCard from '../../components/EventCard';
 import FeaturedItemCard from '../../components/FeaturedItemCard';
 import SectionHeader from '../../components/SectionHeader';
@@ -15,10 +16,13 @@ import SmartImage from '../../components/SmartImage';
 
 export default function EventsScreen() {
   const router = useRouter();
+  const { events: upcomingEvents, fetchEvents, isLoading } = useEventsStore();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [filteredEvents, setFilteredEvents] = useState(upcomingEvents);
   const [filteredFeaturedItems, setFilteredFeaturedItems] = useState(featuredItems);
   const [fontLoaded, setFontLoaded] = useState(false);
+
+  useEffect(() => { fetchEvents(); }, []);
 
   // Charger la police Manga
   useEffect(() => {
