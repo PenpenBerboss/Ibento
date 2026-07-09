@@ -20,7 +20,6 @@ import {
   Compass,
   Users,
   Calendar,
-  Video,
   ListChecks,
   TrendingUp,
   MessageSquare,
@@ -32,11 +31,39 @@ import {
   Hop as Home,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
+import { BlurView } from 'expo-blur';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import { Platform } from 'react-native';
 import * as Font from "expo-font";
 import SmartImage from "../../components/SmartImage";
 // import { privateChats } from './chats';
+
+const VideoAdItem = ({ ad, isActive, isVisible }: { ad: any, isActive: boolean, isVisible: boolean }) => {
+  const player = useVideoPlayer(ad.videoUrl, player => {
+    player.loop = true;
+    // La vidéo active n'est pas en sourdine, les autres le sont.
+    player.muted = !isActive;
+  });
+
+  useEffect(() => {
+    // Met à jour le son et la lecture lorsque la vidéo devient active/inactive
+    player.muted = !isActive;
+    if (isActive && isVisible) {
+      player.play();
+    } else {
+      player.pause();
+    }
+  }, [isActive, isVisible, player]);
+
+  return (
+    <VideoView
+      player={player}
+      style={{ width: '100%', height: '100%' }}
+      contentFit="cover"
+      allowsPictureInPicture
+    />
+  );
+};
 
 const { width, height: screenHeight } = Dimensions.get("window");
 
@@ -99,7 +126,8 @@ export default function HomeScreen() {
     // normalize to embed URL
     let idMatch = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
     const id = idMatch ? idMatch[1] : url;
-    return `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&controls=0&playsinline=1&loop=1&playlist=${id}`;
+    // Les navigateurs bloquent l'autoplay si mute=0. On force mute=1.
+    return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&loop=1&playlist=${id}`;
   };
 
   // Fonction pour contrôler l'audio des vidéos
@@ -200,7 +228,7 @@ export default function HomeScreen() {
     //   route: "/community"
     // },
     {
-      icon: Video,
+      icon: Compass, // Using Compass as Video is no longer imported from lucide
       label: "Reels",
       color: "#4ade80",
       route: "/reels",
@@ -373,8 +401,8 @@ export default function HomeScreen() {
               {[
                 { icon: Home, label: "Accueil", route: "/" },
                 // { icon: ListChecks, label: "Ma Liste", route: "/my-list" },
-                // { icon: Users, label: "Communautés", route: "/community" },
-                { icon: Video, label: "Reels", route: "/reels" },
+                { icon: Users, label: "Communautés", route: "/community" },
+                { icon: Compass, label: "Reels", route: "/reels" },
                 { icon: Calendar, label: "Événements", route: "/events" },
               ].map((item, index) => (
                 <TouchableOpacity
@@ -628,7 +656,8 @@ export default function HomeScreen() {
                               autoPlay
                               loop
                               playsInline
-                              muted={i !== activeAd}
+                              // Obligatoire pour l'autoplay sur la plupart des navigateurs
+                              muted
                               style={{
                                 width: '100%',
                                 height: '100%',
@@ -638,10 +667,11 @@ export default function HomeScreen() {
                             />
                           )
                         ) : (
-                          // Pour les plateformes natives, garder une vue simple
-                          <View style={{ width: '100%', height: '100%', backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ color: '#fff' }}>Vidéo non disponible</Text>
-                          </View>
+                          <VideoAdItem
+                            ad={ad}
+                            isActive={i === activeAd}
+                            isVisible={Math.abs(i - activeAd) <= PRELOAD_NEIGHBORS}
+                          />
                         )
                       ) : (
                         // Empty placeholder to reserve layout and reduce memory

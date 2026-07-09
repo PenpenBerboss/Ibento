@@ -5,14 +5,18 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { upcomingEvents } from '../data/events';
+import dotenv from 'dotenv';
+
+// Charger les variables d'environnement depuis le fichier .env
+dotenv.config();
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDaFe-KGXDicPLm6rorjOc0Rko6szrV4s4",
-  authDomain: "ibento-b9d64.firebaseapp.com",
-  projectId: "ibento-b9d64",
-  storageBucket: "ibento-b9d64.firebasestorage.app",
-  messagingSenderId: "517097646390",
-  appId: "1:517097646390:web:0eb5201d59ce0c318f2b97",
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];

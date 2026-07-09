@@ -47,25 +47,44 @@ export const useAuthStore = create<AuthStore>((set) => ({
   restoreSession: async () => {
     return new Promise((resolve) => {
       const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-        if (firebaseUser) {
-          const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
-          const data = snap.data();
-          const user: User = {
-            id: firebaseUser.uid,
-            firstName: data?.firstName ?? '',
-            lastName: data?.lastName ?? '',
-            email: firebaseUser.email ?? '',
-            phone: data?.phone ?? '',
-            country: data?.country ?? '',
-            address: data?.address ?? '',
-            avatar: data?.avatar,
-          };
-          set({ user, isAuthenticated: true, isLoading: false });
-        } else {
-          set({ user: null, isAuthenticated: false, isLoading: false });
+        try {
+          if (firebaseUser) {
+            const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
+            const data = snap.data();
+            const user: User = {
+              id: firebaseUser.uid,
+              firstName: data?.firstName ?? '',
+              lastName: data?.lastName ?? '',
+              email: firebaseUser.email ?? '',
+              phone: data?.phone ?? '',
+              country: data?.country ?? '',
+              address: data?.address ?? '',
+              avatar: data?.avatar,
+            };
+            set({ user, isAuthenticated: true, isLoading: false });
+          } else {
+            set({ user: null, isAuthenticated: false, isLoading: false });
+          }
+        } catch (error) {
+          console.warn("Firestore inaccessible, utilisation du profil de secours");
+          if (firebaseUser) {
+            set({ 
+              user: { 
+                id: firebaseUser.uid, 
+                email: firebaseUser.email ?? '', 
+                firstName: 'Utilisateur', lastName: '(Hors-ligne)', 
+                phone: '', country: '', address: '' 
+              }, 
+              isAuthenticated: true, 
+              isLoading: false 
+            });
+          } else {
+            set({ user: null, isAuthenticated: false, isLoading: false });
+          }
+        } finally {
+          unsubscribe();
+          resolve();
         }
-        unsubscribe();
-        resolve();
       });
     });
   },
@@ -74,19 +93,27 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isLoading: true });
     try {
       const { user: firebaseUser } = await signInWithEmailAndPassword(auth, email, password);
-      const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
-      const data = snap.data();
-      const user: User = {
-        id: firebaseUser.uid,
-        firstName: data?.firstName ?? '',
-        lastName: data?.lastName ?? '',
-        email: firebaseUser.email ?? '',
-        phone: data?.phone ?? '',
-        country: data?.country ?? '',
-        address: data?.address ?? '',
-        avatar: data?.avatar,
-      };
-      set({ user, isAuthenticated: true, isLoading: false });
+      try {
+        const snap = await getDoc(doc(db, 'users', firebaseUser.uid));
+        const user: User = {
+          id: firebaseUser.uid,
+          firstName: snap.data()?.firstName ?? 'Utilisateur',
+          lastName: snap.data()?.lastName ?? '',
+          email: firebaseUser.email ?? '',
+          phone: snap.data()?.phone ?? '',
+          country: snap.data()?.country ?? '',
+          address: snap.data()?.address ?? '',
+          avatar: snap.data()?.avatar,
+        };
+        set({ user, isAuthenticated: true, isLoading: false });
+      } catch (e) {
+        // Authentifié dans Auth, mais Firestore inaccessible
+        set({ 
+          user: { id: firebaseUser.uid, email: firebaseUser.email ?? '', firstName: 'Utilisateur', lastName: '', phone: '', country: '', address: '' },
+          isAuthenticated: true, 
+          isLoading: false 
+        });
+      }
     } catch (error) {
       set({ isAuthenticated: false, isLoading: false });
       throw error;
@@ -99,20 +126,32 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const { firstName, lastName, email, password, phone, country, address } = userData;
       const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
 
-      await updateProfile(firebaseUser, { displayName: `${firstName} ${lastName}` });
+      try {
+        await updateProfile(firebaseUser, { displayName: `${firstName} ${lastName}` });
 
-      const user: User = {
-        id: firebaseUser.uid,
-        firstName,
-        lastName,
-        email,
-        phone,
-        country,
-        address,
-      };
+        const user: User = {
+          id: firebaseUser.uid,
+          firstName,
+          lastName,
+          email,
+          phone,
+          country,
+          address,
+        };
 
-      await setDoc(doc(db, 'users', firebaseUser.uid), user);
-      set({ user, isAuthenticated: true, isLoading: false });
+        await setDoc(doc(db, 'users', firebaseUser.uid), user);
+        set({ user, isAuthenticated: true, isLoading: false });
+      } catch (firestoreError) {
+        console.error("Erreur Firestore, compte Auth créé avec succès");
+        set({ 
+          user: { 
+            id: firebaseUser.uid, 
+            firstName, lastName, email, phone, country, address 
+          }, 
+          isAuthenticated: true, 
+          isLoading: false 
+        });
+      }
     } catch (error) {
       set({ isAuthenticated: false, isLoading: false });
       throw error;
